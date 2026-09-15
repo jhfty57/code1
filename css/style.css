@@ -398,3 +398,75 @@ body.no-scroll{overflow:hidden}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
 }
+
+/* ================= FANTASY TOUCHES ✨ ================= */
+@keyframes auroraDrift{0%,100%{transform:translate(-8%,-4%) rotate(-3deg) scale(1)}50%{transform:translate(6%,5%) rotate(4deg) scale(1.12)}}
+@keyframes auroraDrift2{0%,100%{transform:translate(6%,3%) scale(1.05)}50%{transform:translate(-7%,-6%) rotate(-5deg) scale(.95)}}
+@keyframes starTwinkle{0%,100%{opacity:.25}50%{opacity:.95}}
+@keyframes orbFloat{0%{transform:translate(0,0);opacity:0}8%{opacity:var(--o,.4)}88%{opacity:var(--o,.4)}100%{transform:translate(26px,-105vh);opacity:0}}
+@keyframes shimmerMove{to{background-position:-200% 0}}
+@keyframes ctaGlow{0%,100%{box-shadow:3px 3px 0 var(--line),0 0 0 rgba(242,201,76,0)}50%{box-shadow:3px 3px 0 var(--line),0 0 20px 4px rgba(242,201,76,.5)}}
+@keyframes pillGlow{0%,100%{box-shadow:2px 2px 0 var(--line),0 0 0 rgba(242,201,76,0)}50%{box-shadow:2px 2px 0 var(--line),0 0 14px 3px rgba(242,201,76,.55)}}
+@keyframes sparkleFly{0%{transform:translate(0,0) scale(.55) rotate(0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.15) rotate(130deg);opacity:0}}
+@keyframes fireflyFloat{0%{transform:translate(0,0);opacity:0}15%{opacity:.9}55%{transform:translate(-15px,-24px)}100%{transform:translate(9px,-50px);opacity:0}}
+
+/* Aurora & sao trời trong hero */
+.hero{isolation:isolate}
+.hero-fantasy{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;border-radius:inherit}
+.hero-fantasy .aurora{position:absolute;display:block;width:70%;height:130%;left:-15%;top:-35%;background:radial-gradient(ellipse at center,rgba(126,188,165,.45),transparent 65%);filter:blur(32px);animation:auroraDrift 13s ease-in-out infinite}
+.hero-fantasy .aurora.a2{left:auto;right:-18%;top:-25%;background:radial-gradient(ellipse at center,rgba(242,201,76,.34),transparent 62%);animation:auroraDrift2 17s ease-in-out infinite}
+.hero-fantasy .aurora.a3{left:26%;top:auto;bottom:-45%;background:radial-gradient(ellipse at center,rgba(231,228,246,.55),transparent 60%);animation:auroraDrift 19s ease-in-out 2s infinite}
+.hero-fantasy .stars{position:absolute;inset:0;animation:starTwinkle 3.2s ease-in-out infinite;background-image:
+  radial-gradient(2px 2px at 12% 22%,rgba(255,244,214,.95) 45%,transparent 55%),
+  radial-gradient(1.6px 1.6px at 28% 68%,rgba(255,244,214,.8) 45%,transparent 55%),
+  radial-gradient(2.2px 2.2px at 44% 14%,rgba(255,236,180,.9) 45%,transparent 55%),
+  radial-gradient(1.4px 1.4px at 58% 74%,rgba(255,244,214,.75) 45%,transparent 55%),
+  radial-gradient(2px 2px at 71% 30%,rgba(255,240,200,.85) 45%,transparent 55%),
+  radial-gradient(1.7px 1.7px at 85% 58%,rgba(255,244,214,.8) 45%,transparent 55%),
+  radial-gradient(2.1px 2.1px at 93% 16%,rgba(255,236,180,.9) 45%,transparent 55%)}
+
+/* Bụi phép thuật bay khắp trang */
+.magic-orbs{position:fixed;inset:0;z-index:3;pointer-events:none;overflow:hidden}
+.magic-orbs i{position:absolute;bottom:-60px;display:block;border-radius:50%;opacity:0;filter:blur(1px);animation:orbFloat linear infinite;
+  background:radial-gradient(circle at 35% 35%,#FFF7DF,#F2C94C 58%,rgba(242,201,76,0) 72%)}
+.magic-orbs i.mint{background:radial-gradient(circle at 35% 35%,#EAF7EE,#7EBCA5 58%,rgba(126,188,165,0) 72%)}
+.magic-orbs i.lav{background:radial-gradient(circle at 35% 35%,#F1EFFB,#A9A3E0 58%,rgba(169,163,224,0) 72%)}
+
+/* Nút & streak phát sáng nhẹ */
+.hero .btn.primary{animation:ctaGlow 3.2s ease-in-out infinite}
+.streak-pill{animation:pillGlow 3.6s ease-in-out infinite}
+
+/* Số liệu shimmer vàng-xanh */
+.stat-card .num{background:linear-gradient(100deg,var(--green) 22%,#D9A62E 46%,var(--green) 70%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:shimmerMove 4.5s linear infinite}
+[data-theme="dark"] .stat-card .num{background-image:linear-gradient(100deg,var(--primary) 22%,#F2C94C 46%,var(--primary) 70%)}
+.hero h1 mark{text-shadow:0 0 22px rgba(242,201,76,.4)}
+
+/* Hover card phủ ánh vàng */
+.feature-card:hover{box-shadow:6px 7px 0 var(--line),0 0 26px rgba(242,201,76,.35)}
+
+/* Lesson header phủ sương phép */
+.lesson-header::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:radial-gradient(ellipse at 82% 8%,rgba(242,201,76,.3),transparent 52%),radial-gradient(ellipse at 8% 92%,rgba(126,188,165,.4),transparent 55%)}
+.lesson-header>*{position:relative;z-index:1}
+
+/* Score ring tỏa sáng khi điểm cao */
+.score-ring.glow{box-shadow:0 0 30px 7px rgba(242,201,76,.45),var(--shadow-sm)}
+
+/* Lấp lánh theo cú click */
+.click-sparkle{position:fixed;z-index:220;pointer-events:none;transform:translate(-50%,-50%);animation:sparkleFly .72s ease-out forwards;filter:drop-shadow(0 0 5px rgba(242,201,76,.7))}
+
+/* Đom đóm quanh Pomodoro */
+@keyframes fireflyFloat{0%{transform:translate(0,0);opacity:0}15%{opacity:.9}55%{transform:translate(-15px,-24px)}100%{transform:translate(9px,-50px);opacity:0}}
+.pomodoro .firefly{position:absolute;right:16px;bottom:12px;width:8px;height:8px;border-radius:50%;pointer-events:none;opacity:0;filter:blur(.4px);
+  background:radial-gradient(circle,#FFF3C4,#F2C94C 60%,transparent 72%);animation:fireflyFloat 7s linear infinite}
+
+/* Banner kho báu trang bài học */
+.lesson-banner{display:flex;align-items:center;gap:18px;background:linear-gradient(120deg,var(--lav),var(--mint) 55%,var(--butter));border:2.5px solid var(--line);border-radius:22px 26px 22px 28px;box-shadow:var(--shadow-sm);padding:14px 22px;margin-bottom:18px;position:relative;overflow:hidden}
+.lesson-banner::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 85% 15%,rgba(255,244,214,.8),transparent 55%)}
+.lesson-banner img{width:96px;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(242,201,76,.7))}
+.lesson-banner h3{font-size:1.15rem;font-weight:800}
+.lesson-banner p{font-size:.88rem;color:var(--muted);font-weight:600;margin:0}
+
+/* Mặt trăng phát sáng ở footer */
+.footer-deco img.moon-glow{filter:drop-shadow(0 0 12px rgba(255,236,180,.95));animation:starTwinkle 3s ease-in-out infinite}
+.footer-deco img.castle{height:74px!important;transform:none!important}

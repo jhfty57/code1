@@ -105,6 +105,14 @@ function staggerPage(){
     c.style.animationDelay = Math.min(i*80, 480)+"ms";
   });
   initReveal();
+  $$(".hero").forEach(h=>{
+    if(h.querySelector(".hero-fantasy")) return;
+    const f=document.createElement("div");
+    f.className="hero-fantasy";
+    f.setAttribute("aria-hidden","true");
+    f.innerHTML='<i class="aurora"></i><i class="aurora a2"></i><i class="aurora a3"></i><div class="stars"></div>';
+    h.prepend(f);
+  });
 }
 let rvObs = null;
 const easeOut = p => 1-Math.pow(1-p,3);
@@ -279,6 +287,13 @@ function renderMethods(){
 function renderLessons(){
   app.innerHTML = `
   <div class="sec-head"><h2>📖 Kho bài học ngữ pháp THPT</h2></div>
+  <div class="lesson-banner">
+    <img src="img/magic-book.png" alt="Sách phép thuật phát sáng" loading="lazy">
+    <div>
+      <h3>Kho báu ngữ pháp ✨</h3>
+      <p>16 "cuốn phép thuật" từ lớp 10 đến lớp 12 — mỗi chủ đề chờ bạn mở ra chinh phục!</p>
+    </div>
+  </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="lesson-filters">
     <button class="chip active" data-grade="all">Tất cả</button>
     <button class="chip" data-grade="10">Lớp 10</button>
@@ -540,7 +555,7 @@ function answerPractice(q, pick){
   });
 }
 function scoreRing(pct, color, big, small){
-  return `<div class="score-ring" style="--pct:${pct};--score-color:${color}"><div class="inner"><b>${big}</b><span>${small}</span></div></div>`;
+  return `<div class="score-ring${pct>=80?" glow":""}" style="--pct:${pct};--score-color:${color}"><div class="inner"><b>${big}</b><span>${small}</span></div></div>`;
 }
 function practiceResult(){
   pq.running=false;
@@ -759,6 +774,41 @@ function renderProgress(){
   };
   sp.addEventListener("click",hide);
   setTimeout(hide,1900);
+})();
+
+/* ---------- Fantasy: bụi phép thuật & lấp lánh khi click ---------- */
+(function initFantasy(){
+  const orbs=document.createElement("div");
+  orbs.className="magic-orbs"; orbs.setAttribute("aria-hidden","true");
+  for(let i=0;i<9;i++){
+    const o=document.createElement("i");
+    const s=(6+Math.random()*14).toFixed(1);
+    o.style.left=(Math.random()*100).toFixed(1)+"vw";
+    o.style.width=o.style.height=s+"px";
+    o.style.animationDuration=(11+Math.random()*14).toFixed(1)+"s";
+    o.style.animationDelay=(-Math.random()*20).toFixed(1)+"s";
+    o.style.setProperty("--o",(0.25+Math.random()*0.35).toFixed(2));
+    if(i%3===1) o.classList.add("mint");
+    else if(i%3===2) o.classList.add("lav");
+    orbs.appendChild(o);
+  }
+  document.body.appendChild(orbs);
+  let active=0;
+  document.addEventListener("click",e=>{
+    if(active>36) return;
+    for(let k=0;k<5;k++){
+      const sp=document.createElement("img");
+      sp.src="img/icons/"+(k%2?"star.png":"sparkle.png");
+      sp.className="click-sparkle"; sp.alt="";
+      const a=Math.random()*Math.PI*2, r=34+Math.random()*42;
+      sp.style.setProperty("--dx",(Math.cos(a)*r).toFixed(0)+"px");
+      sp.style.setProperty("--dy",(Math.sin(a)*r).toFixed(0)+"px");
+      sp.style.left=e.clientX+"px"; sp.style.top=e.clientY+"px";
+      sp.style.width=(10+Math.random()*10).toFixed(0)+"px";
+      document.body.appendChild(sp); active++;
+      setTimeout(()=>{ sp.remove(); active--; },760);
+    }
+  },{passive:true});
 })();
 
 /* ---------- Init ---------- */
