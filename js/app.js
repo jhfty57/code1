@@ -2,8 +2,9 @@
 "use strict";
 
 /* ---------- Data merge ---------- */
-const LESSONS = [...LESSONS_A, ...LESSONS_B];
-const QUESTIONS = [...QUESTIONS_A, ...QUESTIONS_B];
+const LESSONS = [...LESSONS_A, ...LESSONS_B, ...LESSONS_C];
+const QUESTIONS = [...QUESTIONS_A, ...QUESTIONS_B, ...QUESTIONS_C];
+FLASHCARDS.push(...FLASHCARDS_B); // gộp thẻ phần B
 const TOPIC = Object.fromEntries(LESSONS.map(l => [l.id, l]));
 /* Icon minh họa vẽ tay cho từng chủ đề (crop từ sticker sheet) */
 const TOPIC_IMG = {
@@ -11,7 +12,16 @@ const TOPIC_IMG = {
   "nouns":"abacus", "pronouns":"blocks", "articles":"magnifier",
   "gerund":"puzzle", "adj-adv":"palette", "comparison":"scale",
   "passive":"gears", "reported":"envelope", "conditionals":"rainbow",
-  "relative":"chain", "modals":"key", "adverbial":"signpost", "inversion":"spintop"
+  "relative":"chain", "modals":"key", "adverbial":"signpost", "inversion":"spintop",
+  "prepositions":"mushroom", "word-forms":"penciljar", "sva":"bouquet", "causative":"backpack",
+  "phrasal":"plane", "noun-clauses":"snail", "collocations":"teacup", "question-tags":"cactus"
+};
+/* Tranh minh họa riêng của từng bài học */
+const LESSON_ART = {
+  "prepositions":"img/lessons/prepositions.png", "word-forms":"img/lessons/word-forms.png",
+  "sva":"img/lessons/sva.png", "causative":"img/lessons/causative.png",
+  "phrasal":"img/lessons/phrasal.png", "noun-clauses":"img/lessons/noun-clauses.png",
+  "collocations":"img/lessons/collocations.png", "question-tags":"img/lessons/question-tags.png"
 };
 const topicIcon = (id) => TOPIC_IMG[id] ? `<img src="img/icons/${TOPIC_IMG[id]}.png" alt="" loading="lazy">` : (TOPIC[id]?.icon||"📘");
 
@@ -106,7 +116,7 @@ function renderHome(){
   const due = dueCards(), nl = nextLesson();
   const mastered = LESSONS.filter(l=>topicMastery(l.id)>=70).length;
   const feats = [
-    ["cat-lessons.png","tint-mint","📖","Bài học","16 chủ đề đầy đủ lớp 10–12: công thức, ví dụ, mẹo nhớ, lỗi thường gặp.","#/lessons"],
+    ["cat-lessons.png","tint-mint","📖","Bài học",`${LESSONS.length} chủ đề đầy đủ lớp 10–12: công thức, ví dụ, mẹo nhớ, lỗi thường gặp.`,"#/lessons"],
     ["cat-flashcards.png","tint-butter","🃏","Flashcards","96 thẻ ôn tập ngắt quãng — hệ thống tự tính ngày ôn cho bạn.","#/flashcards"],
     ["cat-practice.png","tint-peach","✏️","Luyện tập","128 câu trắc nghiệm lời giải tức thì, trộn xen kẽ chủ đề.","#/practice"],
     ["cat-test.png","tint-lav","📝","Đề thi thử","20 câu / 20 phút có bấm giờ, chấm điểm thang 10.","#/test"],
@@ -140,7 +150,7 @@ function renderHome(){
     <div class="card stat-card"><span class="num">${state.streak.n} 🔥</span><span class="lbl">Chuỗi ngày học liên tiếp</span></div>
     <div class="card stat-card"><span class="num">${state.total.t}</span><span class="lbl">Câu đã luyện</span></div>
     <div class="card stat-card"><span class="num">${accuracy()}%</span><span class="lbl">Độ chính xác</span></div>
-    <div class="card stat-card"><span class="num">${mastered}/16</span><span class="lbl">Chủ đề đã vững (≥70%)</span></div>
+    <div class="card stat-card"><span class="num">${mastered}/${LESSONS.length}</span><span class="lbl">Chủ đề đã vững (≥70%)</span></div>
   </div>
 
   <div class="sec-head"><h2>🎯 Kế hoạch hôm nay</h2><a href="#/methods">Phương pháp học →</a></div>
@@ -180,7 +190,7 @@ function renderMethods(){
     {i:"🔁", n:"Spaced Repetition (Ôn tập ngắt quãng)", d:"Não quên theo đường cong Ebbinghaus. Ôn lại đúng lúc sắp quên giúp chuyển kiến thức vào trí nhớ dài hạn.", h:"Hệ thống <b>Flashcards Leitner 6 hộp</b> tự tính ngày ôn: thẻ khó gặp thường xuyên, thẻ dễ giãn cách 2 → 4 → 8 → 16 → 30 ngày."},
     {i:"🧠", n:"Active Recall (Chủ động gợi nhớ)", d:"Đọc lại nhiều lần chỉ tạo 'ảo giác nhớ'. Tự trả lời câu hỏi trước khi xem đáp án giúp não truy xuất mạnh hơn gấp nhiều lần.", h:"Mỗi bài học có mục <b>🧠 Tự kiểm tra</b>; hệ thống luyện tập luôn buộc bạn chọn đáp án trước khi lộ lời giải."},
     {i:"👨‍🏫", n:"Phương pháp Feynman (Giải thích lại)", d:"Nếu bạn giải thích được một khái niệm cho 'cậu bé 12 tuổi', bạn thực sự hiểu nó. Giải thích bằng lời của mình = kiểm chứng hiểu sâu.", h:"Sau mỗi bài, hãy tự nói lại quy tắc thành 1–2 câu tiếng Việt theo gợi ý <b>🧠 recall</b> cuối bài."},
-    {i:"🔀", n:"Interleaving (Học xen kẽ)", d:"Học dồn (blocked practice) khiến bạn 'quen mặt bài' nhưng quên nhanh. Xen kẽ nhiều chủ đề buộc não phân biệt và chọn đúng công thức.", h:"Chế độ <b>Đề tổng hợp</b> trộn ngẫu nhiên 16 chủ đề; <b>Đề thi thử</b> mô phỏng bài thi thật có bấm giờ."},
+    {i:"🔀", n:"Interleaving (Học xen kẽ)", d:"Học dồn (blocked practice) khiến bạn 'quen mặt bài' nhưng quên nhanh. Xen kẽ nhiều chủ đề buộc não phân biệt và chọn đúng công thức.", h:"Chế độ <b>Đề tổng hợp</b> trộn ngẫu nhiên 24 chủ đề; <b>Đề thi thử</b> mô phỏng bài thi thật có bấm giờ."},
     {i:"📕", n:"Mistake-driven Learning (Học từ lỗi sai)", d:"Lỗi sai là 'bản đồ kho báu' chỉ đúng chỗ bạn yếu. Sửa triệt để từng lỗi tiết kiệm thời gian hơn học thêm bài mới.", h:"Mọi câu sai được tự động ghi vào <b>Sổ lỗi sai</b>; trả lời đúng thì lỗi mới được xóa. Ôn lại riêng phần mình yếu."},
     {i:"🍅", n:"Pomodoro (Tập trung theo phiên)", d:"Não tập trung tối đa khoảng 25 phút. Học theo phiên có nghỉ ngơi giúp giữ năng lượng và giảm xao nhãng.", h:"Góc phải màn hình có <b>Đồng hồ Pomodoro</b>: 25 phút tập trung → 5 phút nghỉ, lặp lại 4 phiên rồi nghỉ dài."},
     {i:"🔥", n:"Gamification & Streak (Chuỗi ngày học)", d:"Thói quen quan trọng hơn động lực. Chuỗi ngày liên tiếp tạo cảm giác không muốn 'gãy chuỗi', giúp duy trì học đều đặn mỗi ngày.", h:"Thanh <b>🔥 streak</b> trên đầu trang tự tăng khi bạn học mỗi ngày — chỉ cần 10 phút/ngày là đủ giữ chuỗi."},
@@ -238,6 +248,7 @@ function renderLessons(){
           <div class="lc-icon">${topicIcon(l.id)}</div>
           <div class="lc-meta"><span class="badge ${LEVEL_CLS[l.level]}">${l.level}</span><span class="badge grade">Lớp ${l.grade}</span></div>
         </div>
+        ${LESSON_ART[l.id]?`<img class="lc-art" src="${LESSON_ART[l.id]}" alt="" loading="lazy">`:""}
         <h3>${esc(l.title)}</h3>
         <p>${esc(l.summary)}</p>
         <div class="pb-track"><div class="pb-fill ${topicMastery(l.id)<40?"low":(topicMastery(l.id)<70?"mid":"")}" style="width:${topicMastery(l.id)}%"></div></div>
@@ -286,7 +297,7 @@ function renderLesson(id){
       <span class="badge" style="background:rgba(255,255,255,.22);color:#fff">Lớp ${l.grade}</span>
       <span class="badge" style="background:rgba(255,255,255,.22);color:#fff">${qCount} câu luyện tập</span>
     </div>
-    <img class="lh-mascot" src="img/mascot-wave.png" alt="" aria-hidden="true">
+    <img class="${LESSON_ART[l.id]?"lh-art":"lh-mascot"}" src="${LESSON_ART[l.id]||"img/mascot-wave.png"}" alt="" aria-hidden="true">
   </div>
   <div class="card">
     ${l.sections.map(secHTML).join("")}
@@ -629,7 +640,7 @@ function renderProgress(){
   app.innerHTML = `
   <div class="sec-head"><h2>📊 Tiến độ học tập</h2></div>
   <div class="grid c4" style="margin-bottom:18px">
-    <div class="card stat-card"><span class="num">${Object.keys(state.learned).length}/16</span><span class="lbl">Bài đã đánh dấu học</span></div>
+    <div class="card stat-card"><span class="num">${Object.keys(state.learned).length}/${LESSONS.length}</span><span class="lbl">Bài đã đánh dấu học</span></div>
     <div class="card stat-card"><span class="num">${state.total.c}/${state.total.t}</span><span class="lbl">Câu đúng / tổng câu</span></div>
     <div class="card stat-card"><span class="num">${accuracy()}%</span><span class="lbl">Độ chính xác</span></div>
     <div class="card stat-card"><span class="num">${state.streak.n} 🔥</span><span class="lbl">Chuỗi ngày học</span></div>

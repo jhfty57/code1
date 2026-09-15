@@ -327,3 +327,10 @@ edia (max-width:560px){
 6px)}
   .hero h1{font-size:1.75rem}
 }
+
+/* ---------- Tranh minh họa bài học ---------- */
+.lh-art{position:absolute;right:16px;bottom:-6px;height:150px;transform:rotate(-3deg);filter:drop-shadow(3px 5px 0 rgba(34,56,44,.3));pointer-events:none}
+[data-theme="dark"] .lh-art{filter:drop-shadow(3px 5px 0 rgba(0,0,0,.45))}
+.lc-art{height:112px;width:100%;object-fit:contain;filter:drop-shadow(2px 3px 0 rgba(34,56,44,.14));background:#FBF7EA;border:2px solid var(--line);border-radius:16px 20px 16px 20px;padding:6px}
+[data-theme="dark"] .lc-art{background:var(--surface-2)}
+@media (max-width:700px){.lh-art{height:96px;opacity:.9}.lc-art{height:96px}}
