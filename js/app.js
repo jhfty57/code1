@@ -26,11 +26,11 @@ const OPT_KEYS = ["A","B","C","D"];
 const LEVEL_CLS = {"Cơ bản":"basic","Trung bình":"medium","Nâng cao":"advanced"};
 
 /* ---------- State (localStorage) ---------- */
-const KEY = "grammarlab_thpt_v2";
+const KEY = "grammarlab_thpt_v1";
 let state = load();
 function load(){ try{ return Object.assign(defaultState(), JSON.parse(localStorage.getItem(KEY))||{}); }catch(e){ return defaultState(); } }
 function defaultState(){ return {learned:{}, topicStats:{}, cards:{}, mistakes:{}, streak:{n:0,last:null}, total:{c:0,t:0}, tests:[], theme:"light"}; }
-function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 function markStudy(){
   const today = new Date().toDateString();
   if(state.streak.last === today) return;
@@ -94,66 +94,7 @@ function route(){
     case "progress": renderProgress(); break;
     default: renderHome();
   }
-  staggerPage();
 }
-
-/* ---------- Page transitions & reveal effects ---------- */
-function staggerPage(){
-  [...app.children].forEach((c,i)=>{
-    c.classList.remove("page-enter"); void c.offsetWidth;
-    c.classList.add("page-enter");
-    c.style.animationDelay = Math.min(i*80, 480)+"ms";
-  });
-  initReveal();
-  $$(".hero").forEach(h=>{
-    if(h.querySelector(".hero-fantasy")) return;
-    const f=document.createElement("div");
-    f.className="hero-fantasy";
-    f.setAttribute("aria-hidden","true");
-    f.innerHTML='<i class="aurora"></i><i class="aurora a2"></i><i class="aurora a3"></i><div class="stars"></div>';
-    h.prepend(f);
-  });
-}
-let rvObs = null;
-const easeOut = p => 1-Math.pow(1-p,3);
-function revealEl(el){
-  el.classList.add("revealed");
-  el.querySelectorAll(".pb-fill").forEach(b=>{
-    const w=b.style.width; if(!w) return;
-    b.style.transition="width .9s cubic-bezier(.2,.7,.3,1)";
-    b.style.width="0";
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{ b.style.width=w; }));
-  });
-  el.querySelectorAll(".stat-card .num").forEach(n=>{
-    if(n.dataset.counted) return; n.dataset.counted="1";
-    const m=n.textContent.match(/^(\d+)([\s\S]*)$/); if(!m) return;
-    const target=+m[1], suf=m[2], t0=performance.now(), dur=900;
-    const step=t=>{
-      const p=Math.min(1,(t-t0)/dur);
-      n.textContent=Math.round(target*easeOut(p))+suf;
-      if(p<1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  });
-}
-function initReveal(){
-  if(typeof IntersectionObserver==="undefined"){
-    $$(".rv").forEach(el=>el.classList.add("revealed")); return;
-  }
-  if(!rvObs){
-    rvObs=new IntersectionObserver(es=>{
-      es.forEach(e=>{ if(e.isIntersecting){ revealEl(e.target); rvObs.unobserve(e.target); } });
-    },{threshold:.06});
-  }
-  $$(".card, .sec-head").forEach(el=>{
-    if(el.dataset.rvMark) return; el.dataset.rvMark="1";
-    el.classList.add("rv"); rvObs.observe(el);
-  });
-}
-const mo = (typeof MutationObserver!=="undefined") ? new MutationObserver(()=>{
-  clearTimeout(mo._t); mo._t=setTimeout(initReveal,70);
-}) : null;
-mo && mo.observe(app,{childList:true,subtree:true});
 window.addEventListener("hashchange", route);
 
 /* ---------- Home ---------- */
@@ -175,14 +116,6 @@ function renderHome(){
   app.innerHTML = `
   <section class="hero">
     <img class="hero-img" src="img/hero.jpg" alt="Grama — khủng long nhỏ ôn ngữ pháp">
-    <div class="hero-deco" aria-hidden="true">
-      <img src="img/icons/plane.png" class="deco-plane" alt="">
-      <img src="img/icons/butterfly.png" class="deco-butterfly1" alt="">
-      <img src="img/icons/butterfly.png" class="deco-butterfly2" alt="">
-      <img src="img/icons/sparkle.png" class="deco-sparkle s1" alt="">
-      <img src="img/icons/sparkle.png" class="deco-sparkle s2" alt="">
-      <img src="img/icons/star.png" class="deco-sparkle s3" alt="">
-    </div>
     <div class="hero-copy">
       <span class="hero-eyebrow">🔥 ${state.streak.n} ngày học liên tiếp</span>
       <h1>Học Ngữ pháp<br><mark>tiếng Anh</mark> THPT</h1>
@@ -287,13 +220,6 @@ function renderMethods(){
 function renderLessons(){
   app.innerHTML = `
   <div class="sec-head"><h2>📖 Kho bài học ngữ pháp THPT</h2></div>
-  <div class="lesson-banner">
-    <img src="img/magic-book.png" alt="Sách phép thuật phát sáng" loading="lazy">
-    <div>
-      <h3>Kho báu ngữ pháp ✨</h3>
-      <p>16 "cuốn phép thuật" từ lớp 10 đến lớp 12 — mỗi chủ đề chờ bạn mở ra chinh phục!</p>
-    </div>
-  </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="lesson-filters">
     <button class="chip active" data-grade="all">Tất cả</button>
     <button class="chip" data-grade="10">Lớp 10</button>
@@ -555,7 +481,7 @@ function answerPractice(q, pick){
   });
 }
 function scoreRing(pct, color, big, small){
-  return `<div class="score-ring${pct>=80?" glow":""}" style="--pct:${pct};--score-color:${color}"><div class="inner"><b>${big}</b><span>${small}</span></div></div>`;
+  return `<div class="score-ring" style="--pct:${pct};--score-color:${color}"><div class="inner"><b>${big}</b><span>${small}</span></div></div>`;
 }
 function practiceResult(){
   pq.running=false;
@@ -564,8 +490,6 @@ function practiceResult(){
   const msg = pct===100?"Hoàn hảo! 🌟":(pct>=80?"Rất tốt! Tiếp tục duy trì nhé 💪":(pct>=50?"Khá ổn — xem lại mấy câu sai nhé 📕":"Đừng nản! Quay lại bài học rồi luyện lại 💪"));
   app.innerHTML = `
   <div class="card result-hero" style="max-width:640px;margin:20px auto">
-    <div class="res-deco" aria-hidden="true"><img src="img/icons/sparkle.png" class="rd1" alt=""><img src="img/icons/heart.png" class="rd2" alt=""><img src="img/icons/star.png" class="rd3" alt=""></div>
-    <img src="img/mascot-trophy.png" alt="Grama chúc mừng" style="width:170px">
     <h2 style="margin-bottom:16px">Kết quả luyện tập</h2>
     ${scoreRing(pct, color, pq.correct+"/"+pq.qs.length, "câu đúng")}
     <div class="result-msg">${msg}</div>
@@ -657,7 +581,6 @@ function submitTest(){
   const msg = pct>=80?"Xuất sắc! Bạn sẵn sàng cho bài thi 🎓":(pct>=50?"Tốt — soát lại các câu sai để chốt kiến thức 📕":"Cần ôn thêm. Về phần Bài học rồi quay lại nhé 💪");
   app.innerHTML = `
   <div class="card result-hero" style="max-width:640px;margin:20px auto">
-    <div class="res-deco" aria-hidden="true"><img src="img/icons/sparkle.png" class="rd1" alt=""><img src="img/icons/heart.png" class="rd2" alt=""><img src="img/icons/star.png" class="rd3" alt=""></div>
     <img src="img/mascot-trophy.png" alt="Grama chúc mừng" style="width:170px">
     <h2 style="margin-bottom:16px">Kết quả đề thi thử</h2>
     ${scoreRing(pct, color, score+"/"+mt.qs.length, "câu đúng")}
@@ -756,59 +679,6 @@ function renderProgress(){
   $("#pomo-fab").addEventListener("click", ()=>$("#pomo-panel").classList.toggle("hidden"));
   $("#pomo-close").addEventListener("click", ()=>$("#pomo-panel").classList.add("hidden"));
   $$(".pomo-modes .chip").forEach(c=>c.addEventListener("click", ()=>setMode(+c.dataset.pmode)));
-})();
-
-/* ---------- Splash intro ---------- */
-(function initSplash(){
-  const sp=$("#splash"); if(!sp) return;
-  let seen=false; try{ seen=!!sessionStorage.getItem("gl-splash"); }catch(e){}
-  if(seen){ sp.remove(); return; }
-  document.body.classList.add("no-scroll");
-  let done=false;
-  const hide=()=>{
-    if(done) return; done=true;
-    sp.classList.add("gone");
-    document.body.classList.remove("no-scroll");
-    setTimeout(()=>sp.remove(),560);
-    try{ sessionStorage.setItem("gl-splash","1"); }catch(e){}
-  };
-  sp.addEventListener("click",hide);
-  setTimeout(hide,1900);
-})();
-
-/* ---------- Fantasy: bụi phép thuật & lấp lánh khi click ---------- */
-(function initFantasy(){
-  const orbs=document.createElement("div");
-  orbs.className="magic-orbs"; orbs.setAttribute("aria-hidden","true");
-  for(let i=0;i<9;i++){
-    const o=document.createElement("i");
-    const s=(6+Math.random()*14).toFixed(1);
-    o.style.left=(Math.random()*100).toFixed(1)+"vw";
-    o.style.width=o.style.height=s+"px";
-    o.style.animationDuration=(11+Math.random()*14).toFixed(1)+"s";
-    o.style.animationDelay=(-Math.random()*20).toFixed(1)+"s";
-    o.style.setProperty("--o",(0.25+Math.random()*0.35).toFixed(2));
-    if(i%3===1) o.classList.add("mint");
-    else if(i%3===2) o.classList.add("lav");
-    orbs.appendChild(o);
-  }
-  document.body.appendChild(orbs);
-  let active=0;
-  document.addEventListener("click",e=>{
-    if(active>36) return;
-    for(let k=0;k<5;k++){
-      const sp=document.createElement("img");
-      sp.src="img/icons/"+(k%2?"star.png":"sparkle.png");
-      sp.className="click-sparkle"; sp.alt="";
-      const a=Math.random()*Math.PI*2, r=34+Math.random()*42;
-      sp.style.setProperty("--dx",(Math.cos(a)*r).toFixed(0)+"px");
-      sp.style.setProperty("--dy",(Math.sin(a)*r).toFixed(0)+"px");
-      sp.style.left=e.clientX+"px"; sp.style.top=e.clientY+"px";
-      sp.style.width=(10+Math.random()*10).toFixed(0)+"px";
-      document.body.appendChild(sp); active++;
-      setTimeout(()=>{ sp.remove(); active--; },760);
-    }
-  },{passive:true});
 })();
 
 /* ---------- Init ---------- */
