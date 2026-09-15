@@ -137,7 +137,8 @@ h1,h2,h3,.logo-text,.btn,.chip,.badge,.fc-rating{font-family:var(--display)}
 .lesson-card{display:flex;flex-direction:column;gap:9px;padding:20px;transition:.15s;position:relative;color:var(--text)}
 .lesson-card:hover{transform:translate(-2px,-2px);box-shadow:6px 7px 0 var(--line)}
 .lesson-card .lc-top{display:flex;align-items:center;justify-content:space-between}
-.lesson-card .lc-icon{font-size:1.5rem;background:var(--surface);width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;border:2.5px solid var(--line);box-shadow:2px 2px 0 var(--line)}
+.lesson-card .lc-icon{font-size:1.5rem;background:var(--surface);width:54px;height:54px;border-radius:16px 20px 16px 20px;display:flex;align-items:center;justify-content:center;border:2.5px solid var(--line);box-shadow:2px 2px 0 var(--line);overflow:hidden}
+.lc-icon img{width:88%;height:88%;object-fit:contain}
 .lesson-card h3{font-size:1.04rem;font-weight:800;line-height:1.35}
 .lesson-card p{font-size:.85rem;color:var(--muted);flex:1;font-weight:500}
 .lc-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
@@ -305,6 +306,17 @@ select{border:2px solid var(--line);border-radius:12px}
   .streak-pill{font-size:.78rem;padding:3px 9px}
 }
 @media (max-width:560px){
+  .container{padding:0 13px}
+  .logo-text{font-size:.95rem}
+  .grid.c4{grid-template-columns:repeat(2,1fr)}
+  .btn{font-size:.88rem}
+  .pomo-panel{width:calc(100vw - 36px)}
+  .hero h1{font-size:1.75rem}
+}
+6px)}
+  .hero h1{font-size:1.75rem}
+}
+edia (max-width:560px){
   .container{padding:0 13px}
   .logo-text{font-size:.95rem}
   .grid.c4{grid-template-columns:repeat(2,1fr)}

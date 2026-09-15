@@ -5,6 +5,15 @@
 const LESSONS = [...LESSONS_A, ...LESSONS_B];
 const QUESTIONS = [...QUESTIONS_A, ...QUESTIONS_B];
 const TOPIC = Object.fromEntries(LESSONS.map(l => [l.id, l]));
+/* Icon minh họa vẽ tay cho từng chủ đề (crop từ sticker sheet) */
+const TOPIC_IMG = {
+  "t-present":"clock", "t-past":"hourglass", "t-future":"rocket",
+  "nouns":"abacus", "pronouns":"blocks", "articles":"magnifier",
+  "gerund":"puzzle", "adj-adv":"palette", "comparison":"scale",
+  "passive":"gears", "reported":"envelope", "conditionals":"rainbow",
+  "relative":"chain", "modals":"key", "adverbial":"signpost", "inversion":"spintop"
+};
+const topicIcon = (id) => TOPIC_IMG[id] ? `<img src="img/icons/${TOPIC_IMG[id]}.png" alt="" loading="lazy">` : (TOPIC[id]?.icon||"📘");
 
 /* ---------- Helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -226,7 +235,7 @@ function renderLessons(){
       <a class="card lesson-card" href="#/lessons/${l.id}">
         ${state.learned[l.id]?'<span class="badge done lc-learned">✓ Đã học</span>':""}
         <div class="lc-top">
-          <div class="lc-icon">${l.icon}</div>
+          <div class="lc-icon">${topicIcon(l.id)}</div>
           <div class="lc-meta"><span class="badge ${LEVEL_CLS[l.level]}">${l.level}</span><span class="badge grade">Lớp ${l.grade}</span></div>
         </div>
         <h3>${esc(l.title)}</h3>
@@ -269,7 +278,7 @@ function renderLesson(id){
   app.innerHTML = `
   <div class="breadcrumb"><a href="#/lessons">📖 Bài học</a> / ${esc(l.title)}</div>
   <div class="lesson-header">
-    <div class="lc-icon">${l.icon}</div>
+    <div class="lc-icon">${topicIcon(l.id)}</div>
     <h1>${esc(l.title)}</h1>
     <p>${esc(l.summary)}</p>
     <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
@@ -313,7 +322,7 @@ function renderFlashcards(){
   app.innerHTML = `
   <div class="sec-head"><h2>🃏 Flashcards — Ôn tập ngắt quãng</h2></div>
   <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:8px">
-    <img src="img/mascot-wave.png" class="framed" style="width:96px" alt="Grama" loading="lazy">
+    <img src="img/mascot-read.png" class="framed" style="width:96px" alt="Grama đang đọc sách" loading="lazy">
     <p class="muted" style="flex:1;min-width:220px;font-size:.92rem;margin:0">Mỗi ngày 5 phút — hệ thống Leitner nhắc bạn ôn <b>đúng lúc sắp quên</b>. Hãy tự nhớ đáp án trong đầu trước khi lật thẻ nhé! 👀</p>
   </div>
   <div class="fc-stats">
@@ -403,6 +412,7 @@ function renderPractice(presetTopic){
   app.innerHTML = `
   <div class="sec-head"><h2>✏️ Luyện tập — Active Recall</h2></div>
   <div class="card" style="max-width:640px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:14px"><img src="img/desk.png" class="framed" style="width:min(320px,80%)" alt="Góc bàn học ấm cúng" loading="lazy"></div>
     <p class="muted" style="font-size:.9rem;margin-bottom:14px">Chọn chủ đề và số câu. Mỗi câu trả lời xong sẽ hiện <b>đáp án + lời giải</b> ngay lập tức. Câu sai được tự động lưu vào Sổ lỗi sai.</p>
     <label style="font-weight:700;font-size:.9rem">Chủ đề</label>
     <select id="pq-topic" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--font);margin:6px 0 14px;font-size:.95rem">
