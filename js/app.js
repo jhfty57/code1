@@ -94,7 +94,58 @@ function route(){
     case "progress": renderProgress(); break;
     default: renderHome();
   }
+  staggerPage();
 }
+
+/* ---------- Page transitions & reveal effects ---------- */
+function staggerPage(){
+  [...app.children].forEach((c,i)=>{
+    c.classList.remove("page-enter"); void c.offsetWidth;
+    c.classList.add("page-enter");
+    c.style.animationDelay = Math.min(i*80, 480)+"ms";
+  });
+  initReveal();
+}
+let rvObs = null;
+const easeOut = p => 1-Math.pow(1-p,3);
+function revealEl(el){
+  el.classList.add("revealed");
+  el.querySelectorAll(".pb-fill").forEach(b=>{
+    const w=b.style.width; if(!w) return;
+    b.style.transition="width .9s cubic-bezier(.2,.7,.3,1)";
+    b.style.width="0";
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ b.style.width=w; }));
+  });
+  el.querySelectorAll(".stat-card .num").forEach(n=>{
+    if(n.dataset.counted) return; n.dataset.counted="1";
+    const m=n.textContent.match(/^(\d+)([\s\S]*)$/); if(!m) return;
+    const target=+m[1], suf=m[2], t0=performance.now(), dur=900;
+    const step=t=>{
+      const p=Math.min(1,(t-t0)/dur);
+      n.textContent=Math.round(target*easeOut(p))+suf;
+      if(p<1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+function initReveal(){
+  if(typeof IntersectionObserver==="undefined"){
+    $$(".rv").forEach(el=>el.classList.add("revealed")); return;
+  }
+  if(!rvObs){
+    rvObs=new IntersectionObserver(es=>{
+      es.forEach(e=>{ if(e.isIntersecting){ revealEl(e.target); rvObs.unobserve(e.target); } });
+    },{threshold:.06});
+  }
+  $$(".card, .sec-head").forEach(el=>{
+    if(el.dataset.rvMark) return; el.dataset.rvMark="1";
+    el.classList.add("rv"); rvObs.observe(el);
+  });
+}
+const mo = (typeof MutationObserver!=="undefined") ? new MutationObserver(()=>{
+  clearTimeout(mo._t); mo._t=setTimeout(initReveal,70);
+}) : null;
+mo && mo.observe(app,{childList:true,subtree:true});
 window.addEventListener("hashchange", route);
 
 /* ---------- Home ---------- */
@@ -116,6 +167,14 @@ function renderHome(){
   app.innerHTML = `
   <section class="hero">
     <img class="hero-img" src="img/hero.jpg" alt="Grama — khủng long nhỏ ôn ngữ pháp">
+    <div class="hero-deco" aria-hidden="true">
+      <img src="img/icons/plane.png" class="deco-plane" alt="">
+      <img src="img/icons/butterfly.png" class="deco-butterfly1" alt="">
+      <img src="img/icons/butterfly.png" class="deco-butterfly2" alt="">
+      <img src="img/icons/sparkle.png" class="deco-sparkle s1" alt="">
+      <img src="img/icons/sparkle.png" class="deco-sparkle s2" alt="">
+      <img src="img/icons/star.png" class="deco-sparkle s3" alt="">
+    </div>
     <div class="hero-copy">
       <span class="hero-eyebrow">🔥 ${state.streak.n} ngày học liên tiếp</span>
       <h1>Học Ngữ pháp<br><mark>tiếng Anh</mark> THPT</h1>
@@ -490,6 +549,8 @@ function practiceResult(){
   const msg = pct===100?"Hoàn hảo! 🌟":(pct>=80?"Rất tốt! Tiếp tục duy trì nhé 💪":(pct>=50?"Khá ổn — xem lại mấy câu sai nhé 📕":"Đừng nản! Quay lại bài học rồi luyện lại 💪"));
   app.innerHTML = `
   <div class="card result-hero" style="max-width:640px;margin:20px auto">
+    <div class="res-deco" aria-hidden="true"><img src="img/icons/sparkle.png" class="rd1" alt=""><img src="img/icons/heart.png" class="rd2" alt=""><img src="img/icons/star.png" class="rd3" alt=""></div>
+    <img src="img/mascot-trophy.png" alt="Grama chúc mừng" style="width:170px">
     <h2 style="margin-bottom:16px">Kết quả luyện tập</h2>
     ${scoreRing(pct, color, pq.correct+"/"+pq.qs.length, "câu đúng")}
     <div class="result-msg">${msg}</div>
@@ -581,6 +642,7 @@ function submitTest(){
   const msg = pct>=80?"Xuất sắc! Bạn sẵn sàng cho bài thi 🎓":(pct>=50?"Tốt — soát lại các câu sai để chốt kiến thức 📕":"Cần ôn thêm. Về phần Bài học rồi quay lại nhé 💪");
   app.innerHTML = `
   <div class="card result-hero" style="max-width:640px;margin:20px auto">
+    <div class="res-deco" aria-hidden="true"><img src="img/icons/sparkle.png" class="rd1" alt=""><img src="img/icons/heart.png" class="rd2" alt=""><img src="img/icons/star.png" class="rd3" alt=""></div>
     <img src="img/mascot-trophy.png" alt="Grama chúc mừng" style="width:170px">
     <h2 style="margin-bottom:16px">Kết quả đề thi thử</h2>
     ${scoreRing(pct, color, score+"/"+mt.qs.length, "câu đúng")}
@@ -679,6 +741,24 @@ function renderProgress(){
   $("#pomo-fab").addEventListener("click", ()=>$("#pomo-panel").classList.toggle("hidden"));
   $("#pomo-close").addEventListener("click", ()=>$("#pomo-panel").classList.add("hidden"));
   $$(".pomo-modes .chip").forEach(c=>c.addEventListener("click", ()=>setMode(+c.dataset.pmode)));
+})();
+
+/* ---------- Splash intro ---------- */
+(function initSplash(){
+  const sp=$("#splash"); if(!sp) return;
+  let seen=false; try{ seen=!!sessionStorage.getItem("gl-splash"); }catch(e){}
+  if(seen){ sp.remove(); return; }
+  document.body.classList.add("no-scroll");
+  let done=false;
+  const hide=()=>{
+    if(done) return; done=true;
+    sp.classList.add("gone");
+    document.body.classList.remove("no-scroll");
+    setTimeout(()=>sp.remove(),560);
+    try{ sessionStorage.setItem("gl-splash","1"); }catch(e){}
+  };
+  sp.addEventListener("click",hide);
+  setTimeout(hide,1900);
 })();
 
 /* ---------- Init ---------- */
