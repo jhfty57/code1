@@ -2,7 +2,7 @@
 "use strict";
 
 /* ---------- Data merge ---------- */
-const LESSONS = [...LESSONS_A, ...LESSONS_B, ...LESSONS_C, ...LESSONS_D];
+const LESSONS = [...LESSONS_A, ...LESSONS_B, ...LESSONS_C, ...LESSONS_D, ...LESSONS_E];
 const QUESTIONS = [...QUESTIONS_A, ...QUESTIONS_B, ...QUESTIONS_C, ...QUESTIONS_D];
 FLASHCARDS.push(...FLASHCARDS_B, ...FLASHCARDS_C); // gộp thẻ phần B & C
 const TOPIC = Object.fromEntries(LESSONS.map(l => [l.id, l]));
@@ -16,7 +16,8 @@ const TOPIC_IMG = {
   "prepositions":"mushroom", "word-forms":"penciljar", "sva":"bouquet", "causative":"backpack",
   "phrasal":"plane", "noun-clauses":"snail", "collocations":"teacup", "question-tags":"cactus",
   "transform":"swap", "subjunctive":"candle", "used-to":"footprints", "so-neither":"bubbleI",
-  "not-until":"flagtime", "linking":"knots", "errors":"bugglass", "signals":"traffic"
+  "not-until":"flagtime", "linking":"knots", "errors":"bugglass", "signals":"traffic",
+  "sentences":"bookworm", "exclamations":"bang", "cleft":"medal", "parallel":"pararrow"
 };
 /* Tranh minh họa riêng của từng bài học */
 const LESSON_ART = {
@@ -27,7 +28,9 @@ const LESSON_ART = {
   "transform":"img/lessons/transform.png", "subjunctive":"img/lessons/subjunctive.png",
   "used-to":"img/lessons/used-to.png", "so-neither":"img/lessons/so-neither.png",
   "not-until":"img/lessons/not-until.png", "linking":"img/lessons/linking.png",
-  "errors":"img/lessons/errors.png", "signals":"img/lessons/signals.png"
+  "errors":"img/lessons/errors.png", "signals":"img/lessons/signals.png",
+  "sentences":"img/lessons/sentences.png", "exclamations":"img/lessons/exclamations.png",
+  "cleft":"img/lessons/cleft.png", "parallel":"img/lessons/parallel.png"
 };
 const topicIcon = (id) => TOPIC_IMG[id] ? `<img src="img/icons/${TOPIC_IMG[id]}.png" alt="" loading="lazy">` : (TOPIC[id]?.icon||"📘");
 
@@ -82,6 +85,11 @@ $("#theme-toggle").addEventListener("click", ()=>{ state.theme = state.theme==="
 /* ---------- Nav ---------- */
 $("#nav-burger").addEventListener("click", ()=> $("#mainnav").classList.toggle("open"));
 document.addEventListener("click", e=>{ if(!e.target.closest("#mainnav") && !e.target.closest("#nav-burger")) $("#mainnav").classList.remove("open"); });
+/* Bấm lại đúng link trang đang mở → load lại trang (ví dụ ra màn hình chọn bài mới) */
+$$(".mainnav a").forEach(a=>a.addEventListener("click", e=>{
+  const href=a.getAttribute("href");
+  if(href===location.hash){ e.preventDefault(); route(); }
+}));
 function paintNav(path){
   $$(".mainnav a").forEach(a=>{
     const k = a.dataset.nav;
@@ -124,7 +132,7 @@ function renderHome(){
   const feats = [
     ["cat-lessons.png","tint-mint","📖","Bài học",`${LESSONS.length} chủ đề đầy đủ lớp 10–12: công thức, ví dụ, mẹo nhớ, lỗi thường gặp.`,"#/lessons"],
     ["cat-flashcards.png","tint-butter","🃏","Flashcards","96 thẻ ôn tập ngắt quãng — hệ thống tự tính ngày ôn cho bạn.","#/flashcards"],
-    ["cat-practice.png","tint-peach","✏️","Luyện tập","128 câu trắc nghiệm lời giải tức thì, trộn xen kẽ chủ đề.","#/practice"],
+    ["cat-practice.png","tint-peach","✏️","Luyện tập",`${QUESTIONS.length} câu trắc nghiệm + 5 kiểu bài tập: điền từ, viết lại, sắp xếp, nối cặp.`,"#/practice"],
     ["cat-test.png","tint-lav","📝","Đề thi thử","20 câu / 20 phút có bấm giờ, chấm điểm thang 10.","#/test"],
     ["cat-mistakes.png","tint-pink","📕","Sổ lỗi sai","Tự ghi lại câu sai, luyện đến khi sửa hết lỗi mới thôi.","#/mistakes"],
     ["cat-progress.png","tint-green","📊","Tiến độ","Độ vững từng chủ đề, chuỗi ngày học, lịch sử đề thi.","#/progress"]
@@ -421,16 +429,46 @@ function rateCard(f, r){
   fcFlipped=false; paintCard();
 }
 
-/* ---------- Practice ---------- */
-let pq = null; // practice session
+/* ---------- Practice (đa kiểu: trắc nghiệm, điền, viết lại, sắp xếp, nối) ---------- */
+let pq = null;
+const normText = s => String(s).toLowerCase().normalize("NFC").replace(/[\u2019\u2018]/g,"'").replace(/[.,!?;:"()]+/g,"").replace(/\s+/g," ").trim();
+function lev(a,b){
+  const m=a.length,n=b.length;
+  if(!m) return n; if(!n) return m;
+  let prev=Array.from({length:n+1},(_,j)=>j), cur=new Array(n+1);
+  for(let i=1;i<=m;i++){
+    cur[0]=i;
+    for(let j=1;j<=n;j++){
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    }
+    [prev,cur]=[cur,prev];
+  }
+  return prev[n];
+}
+function acceptCheck(input, accept){
+  const n=normText(input); if(!n) return false;
+  return accept.some(a=>{
+    const na=normText(a);
+    if(n===na) return true;
+    const tol=na.length>=30?2:(na.length>=6?1:0);
+    return tol>0 && lev(n,na)<=tol;
+  });
+}
+const EX_TYPES=[["mix","🎲 Tổng hợp mọi kiểu"],["mcq","✅ Trắc nghiệm"],["fill","✍️ Điền từ"],["rewrite","🔁 Viết lại câu"],["order","🧩 Sắp xếp từ"],["match","🔗 Nối cặp"]];
+const EX_LABEL={mcq:"Trắc nghiệm",fill:"Điền từ",rewrite:"Viết lại câu",order:"Sắp xếp từ",match:"Nối cặp",mix:"Tổng hợp"};
+
 function renderPractice(presetTopic){
   if(pq && pq.running){ paintPractice(); return; }
-  const topics = [["mixed","🔀 Đề tổng hợp (xen kẽ)"], ...LESSONS.map(l=>[l.id, l.icon+" "+l.title])];
-  app.innerHTML = `
-  <div class="sec-head"><h2>✏️ Luyện tập — Active Recall</h2></div>
+  const topics=[["mixed","🔀 Đề tổng hợp (xen kẽ)"],...LESSONS.map(l=>[l.id,l.icon+" "+l.title])];
+  app.innerHTML=`
+  <div class="sec-head"><h2>✏️ Luyện tập — 5 kiểu bài tập</h2></div>
   <div class="card" style="max-width:640px;margin:0 auto">
     <div style="text-align:center;margin-bottom:14px"><img src="img/desk.png" class="framed" style="width:min(320px,80%)" alt="Góc bàn học ấm cúng" loading="lazy"></div>
-    <p class="muted" style="font-size:.9rem;margin-bottom:14px">Chọn chủ đề và số câu. Mỗi câu trả lời xong sẽ hiện <b>đáp án + lời giải</b> ngay lập tức. Câu sai được tự động lưu vào Sổ lỗi sai.</p>
+    <p class="muted" style="font-size:.9rem;margin-bottom:14px">Chọn <b>kiểu bài</b>, chủ đề và số câu. Mỗi câu đều có <b>lời giải</b>; câu sai tự lưu vào Sổ lỗi sai.</p>
+    <label style="font-weight:700;font-size:.9rem">Kiểu bài tập</label>
+    <select id="pq-type" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--font);margin:6px 0 14px;font-size:.95rem">
+      ${EX_TYPES.map(t=>`<option value="${t[0]}">${t[1]}</option>`).join("")}
+    </select>
     <label style="font-weight:700;font-size:.9rem">Chủ đề</label>
     <select id="pq-topic" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--font);margin:6px 0 14px;font-size:.95rem">
       ${topics.map(t=>`<option value="${t[0]}" ${presetTopic===t[0]?"selected":""}>${t[1]}</option>`).join("")}
@@ -440,6 +478,7 @@ function renderPractice(presetTopic){
       <button class="chip" data-c="5">5 câu</button>
       <button class="chip active" data-c="10">10 câu</button>
       <button class="chip" data-c="15">15 câu</button>
+      <button class="chip" data-c="20">20 câu</button>
     </div>
     <button class="btn primary big" id="pq-start" style="width:100%">🚀 Bắt đầu luyện tập</button>
   </div>`;
@@ -450,65 +489,205 @@ function renderPractice(presetTopic){
     count=+b.dataset.c;
   });
   $("#pq-start").addEventListener("click", ()=>{
-    const t = $("#pq-topic").value;
-    const pool = t==="mixed" ? QUESTIONS : QUESTIONS.filter(q=>q.topic===t);
-    if(!pool.length){ toast("Chưa có câu hỏi cho chủ đề này.","error"); return; }
-    pq = {running:true, qs:shuffle(pool).slice(0,Math.min(count,pool.length)), i:0, correct:0, answered:false, wrongList:[]};
-    markStudy(); paintPractice();
+    startPractice($("#pq-topic").value, $("#pq-type").value, count);
   });
 }
+function startPractice(topic,type,count){
+  let pool;
+  if(type==="mcq") pool=(topic==="mixed"?QUESTIONS:QUESTIONS.filter(q=>q.topic===topic));
+  else if(type==="mix") pool=[
+    ...(topic==="mixed"?QUESTIONS:QUESTIONS.filter(q=>q.topic===topic)),
+    ...(topic==="mixed"?EXERCISES:EXERCISES.filter(q=>q.topic===topic))
+  ];
+  else pool=(topic==="mixed"?EXERCISES:EXERCISES.filter(q=>q.topic===topic)).filter(q=>q.type===type);
+  if(!pool.length){ toast("Chưa có bài tập cho lựa chọn này — thử kiểu khác nhé.","error"); return; }
+  pq={running:true,items:shuffle(pool).slice(0,Math.min(count,pool.length)),i:0,correct:0,answered:false,wrongList:[],order:null,match:null};
+  markStudy(); paintPractice();
+}
+function pqHead(){
+  const it=pq.items[pq.i];
+  return `<div class="quiz-meta"><span>Câu ${pq.i+1}/${pq.items.length} · ${EX_LABEL[it.type]||"Trắc nghiệm"}</span><span>✅ ${pq.correct} đúng</span></div>
+  <div class="quiz-progress"><div class="bar" style="width:${pq.i/pq.items.length*100}%"></div></div>`;
+}
 function paintPractice(){
-  const q = pq.qs[pq.i];
-  app.innerHTML = `
+  const it=pq.items[pq.i];
+  if(it.opts) paintMCQ(it);
+  else if(it.type==="fill"||it.type==="rewrite") paintTyped(it);
+  else if(it.type==="order") paintOrder(it);
+  else if(it.type==="match") paintMatch(it);
+}
+function nextStep(){
+  if(pq.i===pq.items.length-1) practiceResult();
+  else { pq.i++; pq.answered=false; pq.order=null; pq.match=null; paintPractice(); }
+}
+function nextBtnHtml(){
+  return `<button class="btn primary hidden" id="pq-next">${pq.i===pq.items.length-1?"🏁 Xem kết quả":"Câu tiếp theo →"}</button>`;
+}
+function bindNext(){ const b=$("#pq-next"); if(b) b.addEventListener("click", nextStep); }
+function finishItem(ok,it,userText){
+  if(pq.answered) return; pq.answered=true;
+  if(ok) pq.correct++; else pq.wrongList.push({q:it,res:{ok,user:userText||""}});
+  recordAnswer(it,ok);
+}
+function showExplain(ok,it,extra){
+  $("#pq-feedback").innerHTML=`<div class="explain-box ${ok?"good":"bad"}"><b>${ok?"✅ Chính xác!":"❌ Chưa đúng."}</b> ${extra||""}<br>${esc(it.explain||"")}</div>`;
+  const b=$("#pq-next"); if(b){ b.classList.remove("hidden"); }
+}
+function paintMCQ(q){
+  app.innerHTML=`
   <div class="card quiz-card">
-    <div class="quiz-meta"><span>Câu ${pq.i+1}/${pq.qs.length}</span><span>✅ ${pq.correct} đúng</span></div>
-    <div class="quiz-progress"><div class="bar" style="width:${pq.i/pq.qs.length*100}%"></div></div>
+    ${pqHead()}
     <div class="quiz-q en-q">${esc(q.q)}</div>
     <div id="pq-opts">
       ${q.opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="opt-key">${OPT_KEYS[i]}</span><span>${esc(o)}</span></button>`).join("")}
     </div>
     <div id="pq-feedback"></div>
-    <div class="quiz-actions">
-      <span></span>
-      <button class="btn primary hidden" id="pq-next">${pq.i===pq.qs.length-1?"🏁 Xem kết quả":"Câu tiếp theo →"}</button>
-    </div>
+    <div class="quiz-actions"><span></span>${nextBtnHtml()}</div>
   </div>`;
-  $$("#pq-opts .opt").forEach(b=>b.addEventListener("click", ()=>answerPractice(q, +b.dataset.i)));
+  $$("#pq-opts .opt").forEach(b=>b.addEventListener("click", ()=>{
+    if(pq.answered) return;
+    const pick=+b.dataset.i, ok=pick===q.ans;
+    finishItem(ok,q,OPT_KEYS[pick]+". "+q.opts[pick]);
+    $$("#pq-opts .opt").forEach(x=>{
+      x.disabled=true; const i=+x.dataset.i;
+      if(i===q.ans) x.classList.add("correct");
+      else if(i===pick) x.classList.add("wrong");
+    });
+    $("#pq-feedback").innerHTML=`<div class="explain-box ${ok?"good":"bad"}"><b>${ok?"✅ Chính xác!":"❌ Chưa đúng — đáp án là "+OPT_KEYS[q.ans]+". "+esc(q.opts[q.ans])}</b><br>${esc(q.exp)}</div>`;
+    const nb=$("#pq-next"); nb.classList.remove("hidden"); nb.addEventListener("click", nextStep);
+  }));
+  bindNext();
 }
-function answerPractice(q, pick){
-  if(pq.answered) return;
-  pq.answered = true;
-  const ok = pick===q.ans;
-  if(ok) pq.correct++; else pq.wrongList.push(q);
-  recordAnswer(q, ok);
-  $$("#pq-opts .opt").forEach(b=>{
-    b.disabled = true;
+function paintTyped(it){
+  app.innerHTML=`
+  <div class="card quiz-card">
+    ${pqHead()}
+    <div class="quiz-q en-q" style="white-space:pre-line">${esc(it.prompt)}</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <input id="tp-input" style="flex:1;min-width:220px;padding:12px 16px;border:2px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:1rem" placeholder="${it.type==="fill"?"Điền vào chỗ trống...":"Viết cả câu của bạn..."}" autocomplete="off">
+      <button class="btn primary" id="tp-check">Kiểm tra</button>
+    </div>
+    <div id="pq-feedback"></div>
+    <div class="quiz-actions"><span></span>${nextBtnHtml()}</div>
+  </div>`;
+  const doCheck=()=>{
+    if(pq.answered) return;
+    const v=$("#tp-input").value;
+    if(!v.trim()){ toast("Bạn chưa viết câu trả lời.","error"); return; }
+    const ok=acceptCheck(v,it.accept);
+    finishItem(ok,it,v);
+    $("#tp-input").disabled=true; $("#tp-check").disabled=true;
+    showExplain(ok,it, ok?"":`Đáp án gợi ý: <b>${esc(it.accept[0])}</b><br>`);
+  };
+  $("#tp-check").addEventListener("click", doCheck);
+  $("#tp-input").addEventListener("keydown", e=>{ if(e.key==="Enter") doCheck(); });
+  bindNext();
+  $("#tp-input").focus();
+}
+function paintOrder(it){
+  if(!pq.order){
+    let pool;
+    do { pool=shuffle(it.words.map((w,i)=>({w,i}))); }
+    while(pool.length>2 && pool.every((o,idx)=>o.w===it.words[idx]));
+    pq.order={pool,ans:[],checked:false};
+  }
+  const {pool,ans}=pq.order;
+  app.innerHTML=`
+  <div class="card quiz-card">
+    ${pqHead()}
+    <div class="quiz-q en-q">${esc(it.prompt)}</div>
+    <div class="order-ans" id="ord-ans">
+      ${ans.map(o=>`<button class="order-chip placed" data-i="${o.i}">${esc(o.w)}</button>`).join("")||`<span class="muted" style="font-size:.85rem">👇 Chạm các từ bên dưới để ghép thành câu</span>`}
+    </div>
+    <div class="order-pool" id="ord-pool">
+      ${pool.map(o=>`<button class="order-chip" data-i="${o.i}">${esc(o.w)}</button>`).join("")}
+    </div>
+    <div style="margin-top:12px"><button class="btn ghost small" id="ord-reset" ${pq.order.checked?"disabled":""}>⟲ Làm lại</button></div>
+    <div id="pq-feedback"></div>
+    <div class="quiz-actions"><span></span>${nextBtnHtml()}</div>
+  </div>`;
+  const repaint=()=>paintOrder(it);
+  $$("#ord-pool .order-chip").forEach(b=>b.addEventListener("click", ()=>{
+    if(pq.answered) return;
     const i=+b.dataset.i;
-    if(i===q.ans) b.classList.add("correct");
-    else if(i===pick) b.classList.add("wrong");
-  });
-  $("#pq-feedback").innerHTML = `
-    <div class="explain-box ${ok?"good":"bad"}">
-      <b>${ok?"✅ Chính xác!":"❌ Chưa đúng — đáp án là "+OPT_KEYS[q.ans]+". "+esc(q.opts[q.ans])}</b><br>${esc(q.exp)}
-    </div>`;
-  $("#pq-next").classList.remove("hidden");
-  $("#pq-next").addEventListener("click", ()=>{
-    if(pq.i===pq.qs.length-1) return practiceResult();
-    pq.i++; pq.answered=false; paintPractice();
-  });
+    const idx=pq.order.pool.findIndex(o=>o.i===i);
+    pq.order.ans.push(pq.order.pool.splice(idx,1)[0]);
+    if(pq.order.pool.length===0) checkOrder(it);
+    else repaint();
+  }));
+  $$("#ord-ans .order-chip").forEach(b=>b.addEventListener("click", ()=>{
+    if(pq.answered||pq.order.checked) return;
+    const i=+b.dataset.i;
+    const idx=pq.order.ans.findIndex(o=>o.i===i);
+    pq.order.pool.push(pq.order.ans.splice(idx,1)[0]);
+    repaint();
+  }));
+  $("#ord-reset").addEventListener("click", ()=>{ if(!pq.answered){ pq.order=null; repaint(); } });
+  bindNext();
+}
+function checkOrder(it){
+  const st=pq.order; st.checked=true;
+  const joined=st.ans.map(o=>o.w).join(" ");
+  const ok=normText(joined)===normText(it.answer);
+  $$("#ord-ans .order-chip").forEach(c=>c.classList.add(ok?"ok":"bad"));
+  finishItem(ok,it,joined);
+  showExplain(ok,it, ok?"":`Câu đúng: <b>${esc(it.answer)}</b><br>`);
+}
+function paintMatch(it){
+  if(!pq.match){
+    pq.match={selL:null,matched:new Set(),right:shuffle(it.right.map((t,i)=>({t,i}))),tries:0,done:0};
+  }
+  const st=pq.match;
+  app.innerHTML=`
+  <div class="card quiz-card">
+    ${pqHead()}
+    <div class="quiz-q en-q">${esc(it.title||"Nối các cặp phù hợp")}</div>
+    <div class="match-grid">
+      <div class="match-col">${it.left.map((l,i)=>`<button class="match-item ${st.matched.has(i)?"ok":""} ${st.selL===i?"sel":""}" data-l="${i}" ${st.matched.has(i)?"disabled":""}>${esc(l)}</button>`).join("")}</div>
+      <div class="match-col">${st.right.map(o=>`<button class="match-item ${st.matched.has(o.i)?"ok":""}" data-r="${o.i}" ${st.matched.has(o.i)?"disabled":""}>${esc(o.t)}</button>`).join("")}</div>
+    </div>
+    <p class="muted" style="font-size:.82rem;margin-top:10px">👆 Chọn một mục cột trái, rồi chọn câu ghép đúng ở cột phải. Nối sai nhiều lần sẽ bị tính không đạt!</p>
+    <div id="pq-feedback"></div>
+    <div class="quiz-actions"><span></span>${nextBtnHtml()}</div>
+  </div>`;
+  const repaint=()=>paintMatch(it);
+  $$(".match-col .match-item[data-l]").forEach(b=>b.addEventListener("click", ()=>{
+    if(pq.answered||st.matched.has(+b.dataset.l)) return;
+    st.selL=+b.dataset.l;
+    $$(".match-col .match-item[data-l]").forEach(x=>x.classList.toggle("sel",+x.dataset.l===st.selL));
+  }));
+  $$(".match-col .match-item[data-r]").forEach(b=>b.addEventListener("click", ()=>{
+    if(pq.answered||st.matched.has(+b.dataset.r)) return;
+    if(st.selL===null){ toast("Chọn một mục ở cột trái trước.","error"); return; }
+    const r=+b.dataset.r;
+    if(r===st.selL){
+      st.matched.add(r); st.done++;
+      if(st.done===it.left.length){
+        const ok=st.tries===0;
+        finishItem(ok,it, ok?"Nối đúng tất cả các cặp":("Nối sai "+st.tries+" lần"));
+        showExplain(ok,it, ok?"":`Đáp án đúng:<br>${it.left.map((l,i)=>`• ${esc(l)} → <b>${esc(it.right[i])}</b>`).join("<br>")}<br>`);
+      } else repaint();
+    } else {
+      st.tries++;
+      b.classList.add("flash-bad");
+      setTimeout(()=>b.classList.remove("flash-bad"),450);
+    }
+  }));
+  bindNext();
 }
 function scoreRing(pct, color, big, small){
   return `<div class="score-ring" style="--pct:${pct};--score-color:${color}"><div class="inner"><b>${big}</b><span>${small}</span></div></div>`;
 }
 function practiceResult(){
   pq.running=false;
-  const pct = Math.round(pq.correct/pq.qs.length*100);
-  const color = pct>=80?"var(--success)":(pct>=50?"var(--warning)":"var(--danger)");
-  const msg = pct===100?"Hoàn hảo! 🌟":(pct>=80?"Rất tốt! Tiếp tục duy trì nhé 💪":(pct>=50?"Khá ổn — xem lại mấy câu sai nhé 📕":"Đừng nản! Quay lại bài học rồi luyện lại 💪"));
-  app.innerHTML = `
+  const pct=Math.round(pq.correct/pq.items.length*100);
+  const color=pct>=80?"var(--success)":(pct>=50?"var(--warning)":"var(--danger)");
+  const msg=pct===100?"Hoàn hảo! 🌟":(pct>=80?"Rất tốt! Tiếp tục duy trì nhé 💪":(pct>=50?"Khá ổn — xem lại mấy câu sai nhé 📕":"Đừng nản! Quay lại bài học rồi luyện lại 💪"));
+  app.innerHTML=`
   <div class="card result-hero" style="max-width:640px;margin:20px auto">
+    <img src="img/mascot-trophy.png" alt="Grama chúc mừng" style="width:170px">
     <h2 style="margin-bottom:16px">Kết quả luyện tập</h2>
-    ${scoreRing(pct, color, pq.correct+"/"+pq.qs.length, "câu đúng")}
+    ${scoreRing(pct, color, pq.correct+"/"+pq.items.length, "câu đúng")}
     <div class="result-msg">${msg}</div>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
       <button class="btn primary" id="pr-retry">🔄 Luyện lại</button>
@@ -517,17 +696,29 @@ function practiceResult(){
     </div>
   </div>
   ${pq.wrongList.length?`<div class="sec-head"><h2>📕 Các câu cần xem lại</h2></div>
-  <div style="max-width:640px;margin:0 auto">${pq.wrongList.map(q=>reviewHTML(q,null)).join("")}</div>`:""}`;
+  <div style="max-width:640px;margin:0 auto">${pq.wrongList.map(w=>reviewHTML(w.q,w.res)).join("")}</div>`:""}`;
   $("#pr-retry").addEventListener("click", ()=>{ pq=null; renderPractice(); });
 }
-function reviewHTML(q, picked){
-  const ok = picked===q.ans;
-  return `<div class="review-item">
-    <div class="rv-q">${esc(q.q)}</div>
+function reviewHTML(item,res){
+  if(item.opts){
+    const ok=res===item.ans;
+    return `<div class="review-item">
+    <div class="rv-q">${esc(item.q)}</div>
     <div class="rv-a">
-      ${picked!==null?`<span class="${ok?"ok":"no"}">Bạn chọn: ${OPT_KEYS[picked]}. ${esc(q.opts[picked])} ${ok?"✓":"✗"}</span>`:""}
-      <span class="${ok?"ok":"no"}">Đáp án: ${OPT_KEYS[q.ans]}. ${esc(q.opts[q.ans])}</span>
-      <span class="muted">💡 ${esc(q.exp)}</span>
+      ${typeof res==="number"?`<span class="${ok?"ok":"no"}">Bạn chọn: ${OPT_KEYS[res]}. ${esc(item.opts[res])} ${ok?"✓":"✗"}</span>`:""}
+      <span class="${ok?"ok":"no"}">Đáp án: ${OPT_KEYS[item.ans]}. ${esc(item.opts[item.ans])}</span>
+      <span class="muted">💡 ${esc(item.exp||"")}</span>
+    </div>
+  </div>`;
+  }
+  const ok=!!(res&&res.ok);
+  const ans=item.answer||(item.accept?item.accept[0]:"");
+  return `<div class="review-item">
+    <div class="rv-q">${esc(item.prompt||item.title||"")}</div>
+    <div class="rv-a">
+      ${res&&res.user?`<span class="${ok?"ok":"no"}">Bạn làm: ${esc(res.user)} ${ok?"✓":"✗"}</span>`:""}
+      <span class="${ok?"ok":"no"}">Đáp án: ${esc(ans)}</span>
+      <span class="muted">💡 ${esc(item.explain||"")}</span>
     </div>
   </div>`;
 }
@@ -634,7 +825,7 @@ function renderMistakes(){
   </div>`).join("")}`
   :`<div class="card empty-state"><span class="big">🌈</span><b>Sổ lỗi sai đang trống!</b><p style="margin-top:8px">Hãy vào luyện tập — câu nào sai sẽ tự động xuất hiện ở đây để bạn sửa đến khi thuộc.</p><a class="btn primary small" style="margin-top:14px" href="#/practice">Bắt đầu luyện tập</a></div>`}`;
   if(qs.length) $("#mk-practice").addEventListener("click", ()=>{
-    pq = {running:true, qs:shuffle(qs), i:0, correct:0, answered:false, wrongList:[]};
+    pq = {running:true, items:shuffle(qs), i:0, correct:0, answered:false, wrongList:[], order:null, match:null};
     markStudy(); paintPractice();
   });
 }

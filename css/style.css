@@ -337,3 +337,20 @@ edia (max-width:560px){
 [data-theme="dark"] .lc-art{background:var(--surface-2)}
 @media (max-width:700px){.lc-art{height:96px}}
 @media (max-width:860px){.lh-art{display:none}.lesson-header{padding:26px}}
+
+/* ---------- Bài tập điền / sắp xếp / nối ---------- */
+.order-ans{min-height:58px;border:2px dashed var(--line);border-radius:14px;background:var(--surface-2);display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px;margin-bottom:12px}
+.order-pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:var(--surface-2);border-radius:14px;border:2px solid var(--line)}
+.order-chip{font-family:var(--display);font-weight:800;font-size:.95rem;padding:8px 15px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;box-shadow:2px 2px 0 var(--line);transition:.12s;font-family:var(--display)}
+.order-chip:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--line)}
+.order-chip.placed{background:var(--mint)}
+.order-chip.ok{background:var(--success-soft);border-color:var(--success)}
+.order-chip.bad{background:var(--danger-soft);border-color:var(--danger)}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.match-col{display:flex;flex-direction:column;gap:8px}
+.match-item{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;font-family:var(--font);font-size:.88rem;color:var(--text);font-weight:600;box-shadow:2px 2px 0 var(--line);transition:.12s;line-height:1.4}
+.match-item:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--line)}
+.match-item.sel{background:var(--primary-soft);border-color:var(--primary)}
+.match-item.ok{background:var(--success-soft);border-color:var(--success);opacity:.75}
+.match-item.flash-bad{background:var(--danger-soft);border-color:var(--danger);animation:blink .45s}
+@media (max-width:640px){.match-grid{grid-template-columns:1fr}}
