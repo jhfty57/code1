@@ -106,8 +106,7 @@ h1,h2,h3,.logo-text,.btn,.chip,.badge,.fc-rating{font-family:var(--display)}
 /* ---------- Feature cards (trang chủ) ---------- */
 .feature-card{display:flex;flex-direction:column;gap:8px;padding:18px;position:relative;transition:.15s;overflow:hidden;color:var(--text)}
 .feature-card:hover{transform:translate(-2px,-2px);box-shadow:6px 7px 0 var(--line)}
-.feature-card .fc-chip{width:46px;height:46px;background:var(--surface);border:2.5px solid var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;box-shadow:2px 2px 0 var(--line)}
-.feature-card img{height:118px;object-fit:contain;margin:2px auto}
+.feature-card .fc-chip{width:46px;height:46px;background:#FBF7EA;border:2.5px solid var(--line);border-radius:16px 20px 16px 20px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;box-shadow:2px 2px 0 var(--line)}
 .feature-card h3{font-size:1.08rem;font-weight:800}
 .feature-card p{font-size:.85rem;color:var(--muted);font-weight:500}
 .feature-card .fc-arrow{position:absolute;top:16px;right:16px;font-weight:800;color:var(--muted);transition:.15s}
@@ -197,7 +196,6 @@ td b{color:var(--green)}
 .fc-rating.good{background:var(--success)}
 .fc-rating.easy{background:var(--green-2)}
 .fc-empty{text-align:center;padding:40px 20px;color:var(--text)}
-.fc-empty img{width:170px;margin:0 auto 6px}
 .fc-empty .big{font-size:3rem;display:block;margin-bottom:10px}
 
 /* ---------- Quiz / Practice ---------- */
@@ -224,7 +222,6 @@ select{border:2px solid var(--line);border-radius:12px}
 
 /* ---------- Result ---------- */
 .result-hero{text-align:center;padding:32px 20px}
-.result-hero img{width:190px;margin:0 auto 4px}
 .score-ring{--pct:0;width:150px;height:150px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;background:conic-gradient(var(--score-color) calc(var(--pct)*1%),var(--surface-2) 0);border:3px solid var(--line);box-shadow:var(--shadow-sm)}
 .score-ring .inner{width:116px;height:116px;border-radius:50%;background:var(--surface);border:2.5px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center}
 .score-ring .inner b{font-size:1.65rem;font-weight:800}
@@ -259,7 +256,6 @@ select{border:2px solid var(--line);border-radius:12px}
 .mistake-item{display:flex;flex-direction:column;gap:8px}
 .mistake-item .m-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .empty-state{text-align:center;padding:40px 20px}
-.empty-state img{width:180px;margin:0 auto 8px}
 .empty-state .big{font-size:3.2rem;display:block;margin-bottom:12px}
 
 /* ---------- Methods page ---------- */
@@ -314,5 +310,8 @@ select{border:2px solid var(--line);border-radius:12px}
   .grid.c4{grid-template-columns:repeat(2,1fr)}
   .btn{font-size:.88rem}
   .pomo-panel{width:calc(100vw - 36px)}
+  .hero h1{font-size:1.75rem}
+}
+6px)}
   .hero h1{font-size:1.75rem}
 }

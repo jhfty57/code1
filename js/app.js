@@ -179,7 +179,16 @@ function renderMethods(){
   ];
   app.innerHTML = `
   <div class="sec-head"><h2>🧠 8 phương pháp học tập hiệu quả đang áp dụng</h2></div>
-  <p class="muted" style="margin-bottom:18px">Website không chỉ có nội dung — cách bạn học mới quyết định kết quả. Mỗi tính năng dưới đây dựa trên một nguyên lý khoa học về trí nhớ và học tập.</p>
+  <section class="hero" style="min-height:0;margin-top:6px">
+    <div class="hero-copy" style="max-width:100%;padding:24px 28px">
+      <span class="hero-eyebrow">✨ Học đúng cách, nhớ lâu gấp 3 lần</span>
+      <h1 style="font-size:clamp(1.35rem,3vw,1.9rem)">Không học nhiều — học <mark>đúng phương pháp</mark></h1>
+    </div>
+  </section>
+  <div style="text-align:center;margin:0 auto 26px">
+    <img src="img/methods.png" class="framed" style="width:min(430px,88%)" alt="Sách mở nảy mầm bóng đèn" loading="lazy">
+    <p class="muted" style="font-size:.9rem;margin-top:10px">Website không chỉ có nội dung — cách bạn học mới quyết định kết quả. Mỗi tính năng dưới đây dựa trên một nguyên lý khoa học về trí nhớ và học tập.</p>
+  </div>
   <div class="grid c2">
     ${methods.map(m=>`<div class="card method-card">
       <div class="m-icon">${m.i}</div>
@@ -268,6 +277,7 @@ function renderLesson(id){
       <span class="badge" style="background:rgba(255,255,255,.22);color:#fff">Lớp ${l.grade}</span>
       <span class="badge" style="background:rgba(255,255,255,.22);color:#fff">${qCount} câu luyện tập</span>
     </div>
+    <img class="lh-mascot" src="img/mascot-wave.png" alt="" aria-hidden="true">
   </div>
   <div class="card">
     ${l.sections.map(secHTML).join("")}
@@ -302,6 +312,10 @@ function renderFlashcards(){
   const learning = FLASHCARDS.filter(f=>{const c=cardState(f.id); return c && c.box<5 && c.due>Date.now();}).length;
   app.innerHTML = `
   <div class="sec-head"><h2>🃏 Flashcards — Ôn tập ngắt quãng</h2></div>
+  <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:8px">
+    <img src="img/mascot-wave.png" class="framed" style="width:96px" alt="Grama" loading="lazy">
+    <p class="muted" style="flex:1;min-width:220px;font-size:.92rem;margin:0">Mỗi ngày 5 phút — hệ thống Leitner nhắc bạn ôn <b>đúng lúc sắp quên</b>. Hãy tự nhớ đáp án trong đầu trước khi lật thẻ nhé! 👀</p>
+  </div>
   <div class="fc-stats">
     <div class="card stat-card" style="flex:1"><span class="num">${due.length}</span><span class="lbl">Thẻ đến hạn hôm nay</span></div>
     <div class="card stat-card" style="flex:1"><span class="num">${FLASHCARDS.length}</span><span class="lbl">Tổng số thẻ</span></div>
