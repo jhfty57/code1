@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GrammarLab THPT — Học ngữ pháp tiếng Anh cấp THPT hiệu quả với Spaced Repetition, Active Recall, Flashcards, Đề thi thử, Sổ lỗi sai.">
+  <title>GrammarLab THPT — Học ngữ pháp tiếng Anh hiệu quả</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="logo" href="#/">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">GrammarLab <em>THPT</em></span>
+      </a>
+      <nav class="mainnav" id="mainnav">
+        <a href="#/" data-nav="/">🏠 Trang chủ</a>
+        <a href="#/methods" data-nav="/methods">🧠 Phương pháp</a>
+        <a href="#/lessons" data-nav="/lessons">📖 Bài học</a>
+        <a href="#/flashcards" data-nav="/flashcards">🃏 Flashcards</a>
+        <a href="#/practice" data-nav="/practice">✏️ Luyện tập</a>
+        <a href="#/test" data-nav="/test">📝 Đề thi thử</a>
+        <a href="#/mistakes" data-nav="/mistakes">📕 Lỗi sai <span class="mistake-badge hidden" id="mistake-badge"></span></a>
+        <a href="#/progress" data-nav="/progress">📊 Tiến độ</a>
+      </nav>
+      <div class="topbar-actions">
+        <div class="streak-pill" id="streak-pill" title="Chuỗi ngày học liên tiếp">🔥 <b id="streak-num">0</b></div>
+        <button class="icon-btn" id="theme-toggle" title="Chuyển giao diện sáng/tối">🌙</button>
+        <button class="icon-btn nav-burger" id="nav-burger" title="Mở menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" class="container"></main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>📚 <b>GrammarLab THPT</b> — Ngữ pháp tiếng Anh Trung học Phổ thông, học bằng phương pháp khoa học.</p>
+      <p class="muted">Spaced Repetition · Active Recall · Interleaving · Mistake-driven Learning · Pomodoro</p>
+    </div>
+  </footer>
+
+  <!-- Pomodoro floating widget -->
+  <div class="pomodoro" id="pomodoro">
+    <button class="pomo-fab" id="pomo-fab" title="Đồng hồ Pomodoro — học 25 phút, nghỉ 5 phút">🍅</button>
+    <div class="pomo-panel hidden" id="pomo-panel">
+      <div class="pomo-head">
+        <b>🍅 Pomodoro</b>
+        <button class="icon-btn small" id="pomo-close">✕</button>
+      </div>
+      <div class="pomo-modes">
+        <button class="chip active" data-pmode="25">Tập trung 25'</button>
+        <button class="chip" data-pmode="5">Nghỉ 5'</button>
+        <button class="chip" data-pmode="15">Nghỉ dài 15'</button>
+      </div>
+      <div class="pomo-time" id="pomo-time">25:00</div>
+      <div class="pomo-actions">
+        <button class="btn primary small" id="pomo-start">▶ Bắt đầu</button>
+        <button class="btn ghost small" id="pomo-reset">⟲ Đặt lại</button>
+      </div>
+      <p class="pomo-hint">Học tập trung 25 phút → nghỉ 5 phút. Sau 4 phiên, nghỉ dài 15 phút.</p>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toast-wrap"></div>
+
+  <script src="js/data-lessons-a.js"></script>
+  <script src="js/data-lessons-b.js"></script>
+  <script src="js/data-questions-a.js"></script>
+  <script src="js/data-questions-b.js"></script>
+  <script src="js/data-flashcards.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
