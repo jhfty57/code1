@@ -96,24 +96,45 @@ function accuracy(){ return state.total.t ? Math.round(state.total.c/state.total
 function renderHome(){
   const due = dueCards(), nl = nextLesson();
   const mastered = LESSONS.filter(l=>topicMastery(l.id)>=70).length;
+  const feats = [
+    ["cat-lessons.png","tint-mint","📖","Bài học","16 chủ đề đầy đủ lớp 10–12: công thức, ví dụ, mẹo nhớ, lỗi thường gặp.","#/lessons"],
+    ["cat-flashcards.png","tint-butter","🃏","Flashcards","96 thẻ ôn tập ngắt quãng — hệ thống tự tính ngày ôn cho bạn.","#/flashcards"],
+    ["cat-practice.png","tint-peach","✏️","Luyện tập","128 câu trắc nghiệm lời giải tức thì, trộn xen kẽ chủ đề.","#/practice"],
+    ["cat-test.png","tint-lav","📝","Đề thi thử","20 câu / 20 phút có bấm giờ, chấm điểm thang 10.","#/test"],
+    ["cat-mistakes.png","tint-pink","📕","Sổ lỗi sai","Tự ghi lại câu sai, luyện đến khi sửa hết lỗi mới thôi.","#/mistakes"],
+    ["cat-progress.png","tint-green","📊","Tiến độ","Độ vững từng chủ đề, chuỗi ngày học, lịch sử đề thi.","#/progress"]
+  ];
   app.innerHTML = `
   <section class="hero">
-    <h1>Học ngữ pháp tiếng Anh THPT<br>bằng phương pháp khoa học 🧠</h1>
-    <p>16 chủ đề đầy đủ theo chương trình lớp 10–12 · Flashcards ôn ngắt quãng · Luyện tập chủ động ghi nhớ · Đề thi thử có bấm giờ · Sổ lỗi sai thông minh.</p>
-    <div class="btns">
-      <a class="btn primary" href="#/lessons">📖 Bắt đầu học</a>
-      <a class="btn ghost" href="#/flashcards">🃏 Ôn ${due} thẻ hôm nay</a>
+    <img class="hero-img" src="img/hero.jpg" alt="Grama — khủng long nhỏ ôn ngữ pháp">
+    <div class="hero-copy">
+      <span class="hero-eyebrow">🔥 ${state.streak.n} ngày học liên tiếp</span>
+      <h1>Học Ngữ pháp<br><mark>tiếng Anh</mark> THPT</h1>
+      <p>Đầy đủ bài học, phương pháp ghi nhớ khoa học và luyện tập mỗi ngày — cùng Grama chinh phục ngữ pháp thật dễ dàng!</p>
+      <div class="btns">
+        <a class="btn primary big" href="#/lessons">Bắt đầu học →</a>
+        <a class="btn ghost big" href="#/flashcards">Ôn ${due} thẻ hôm nay ›</a>
+      </div>
     </div>
   </section>
 
-  <div class="grid c4">
+  <div class="grid c3">
+    ${feats.map(f=>`<a class="card feature-card ${f[1]}" href="${f[5]}">
+      <span class="fc-arrow">›</span>
+      <div class="fc-chip">${f[2]}</div>
+      <img src="img/${f[0]}" alt="${f[3]}" loading="lazy">
+      <h3>${f[3]}</h3><p>${f[4]}</p>
+    </a>`).join("")}
+  </div>
+
+  <div class="grid c4" style="margin-top:22px">
     <div class="card stat-card"><span class="num">${state.streak.n} 🔥</span><span class="lbl">Chuỗi ngày học liên tiếp</span></div>
     <div class="card stat-card"><span class="num">${state.total.t}</span><span class="lbl">Câu đã luyện</span></div>
     <div class="card stat-card"><span class="num">${accuracy()}%</span><span class="lbl">Độ chính xác</span></div>
     <div class="card stat-card"><span class="num">${mastered}/16</span><span class="lbl">Chủ đề đã vững (≥70%)</span></div>
   </div>
 
-  <div class="sec-head"><h2>🎯 Kế hoạch hôm nay</h2><a class="muted" href="#/methods">Phương pháp học →</a></div>
+  <div class="sec-head"><h2>🎯 Kế hoạch hôm nay</h2><a href="#/methods">Phương pháp học →</a></div>
   <div class="grid c3">
     <div class="card">
       <h3 style="margin-bottom:6px">🃏 Ôn Flashcards</h3>
@@ -300,7 +321,7 @@ function renderFlashcards(){
     </table></div>
   </div>`;
   if(!due.length){
-    $("#fc-zone").innerHTML = `<div class="fc-empty card"><span class="big">🎉</span><b>Không còn thẻ đến hạn!</b><p style="margin-top:6px">Bạn đã ôn hết hôm nay. Thẻ tiếp theo sẽ mở khóa theo lịch spaced repetition.</p></div>`;
+    $("#fc-zone").innerHTML = `<div class="fc-empty card"><img src="img/mascot-wave.png" alt="Grama"><b>Không còn thẻ đến hạn!</b><p style="margin-top:6px">Bạn đã ôn hết hôm nay. Thẻ tiếp theo sẽ mở khóa theo lịch spaced repetition.</p></div>`;
     return;
   }
   startFcSession(due);
@@ -352,7 +373,7 @@ function rateCard(f, r){
   markStudy(); save();
   fcIdx++;
   if(fcIdx>=fcSession.length){
-    $("#fc-zone").innerHTML = `<div class="fc-empty card"><span class="big">🏆</span><b>Hoàn thành ${fcSession.length} thẻ!</b><p style="margin-top:6px">Kiến thức đang được 'nặn' vào trí nhớ dài hạn. Quay lại mỗi ngày để giữ chuỗi 🔥</p>
+    $("#fc-zone").innerHTML = `<div class="fc-empty card"><img src="img/mascot-trophy.png" alt="Grama nâng cúp"><b>Hoàn thành ${fcSession.length} thẻ!</b><p style="margin-top:6px">Kiến thức đang được 'nặn' vào trí nhớ dài hạn. Quay lại mỗi ngày để giữ chuỗi 🔥</p>
     <a class="btn primary small" style="margin-top:14px" href="#/lessons">Tiếp tục học bài mới</a></div>`;
     renderFlashcards._refreshStats && renderFlashcards();
     return;
@@ -536,6 +557,7 @@ function submitTest(){
   const msg = pct>=80?"Xuất sắc! Bạn sẵn sàng cho bài thi 🎓":(pct>=50?"Tốt — soát lại các câu sai để chốt kiến thức 📕":"Cần ôn thêm. Về phần Bài học rồi quay lại nhé 💪");
   app.innerHTML = `
   <div class="card result-hero" style="max-width:640px;margin:20px auto">
+    <img src="img/mascot-trophy.png" alt="Grama chúc mừng" style="width:170px">
     <h2 style="margin-bottom:16px">Kết quả đề thi thử</h2>
     ${scoreRing(pct, color, score+"/"+mt.qs.length, "câu đúng")}
     <div class="result-msg">${msg}</div>

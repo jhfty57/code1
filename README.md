@@ -16,7 +16,7 @@ Website học ngữ pháp tiếng Anh dành cho học sinh Trung học Phổ th�
 | 📊 Tiến độ | Độ vững từng chủ đề, lịch sử đề thi, độ chính xác |
 | 🍅 Pomodoro | Đồng hồ tập trung 25/5/15 phút góc màn hình |
 
-Hỗ trợ giao diện sáng/tối, lưu tiến độ tự động bằng `localStorage`, thiết kế responsive cho điện thoại.
+Giao diện phong cách "cute learning" lấy cảm hứng từ các nền tảng LMS hiện đại: mascot khủng long Grama, bảng màu pastel kem–xanh rêu, viền đậm và đổ bóng đặc (neo-brutalist), font Baloo 2. Hỗ trợ giao diện sáng/tối, lưu tiến độ tự động bằng `localStorage`, thiết kế responsive cho điện thoại.
 
 ## 🚀 Chạy
 
@@ -29,9 +29,10 @@ python3 -m http.server 8000
 
 ```
 index.html            — trang chính
-css/style.css         — giao diện (có dark mode)
+css/style.css         — giao diện phong cách pastel "cute learning" (có dark mode)
 js/app.js             — router, flashcards spaced repetition, luyện tập, đề thi, tiến độ, Pomodoro
 js/data-lessons-*.js  — nội dung 16 bài học
 js/data-questions-*.js— ngân hàng 128 câu hỏi + lời giải
 js/data-flashcards.js — 96 thẻ ghi nhớ
+img/                  — bộ ảnh minh họa (mascot khủng long Grama, hero banner, icon chủ đề) — tạo bằng AI
 ```
