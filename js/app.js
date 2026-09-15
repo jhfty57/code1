@@ -29,7 +29,7 @@ const LEVEL_CLS = {"Cơ bản":"basic","Trung bình":"medium","Nâng cao":"advan
 const KEY = "grammarlab_thpt_v1";
 let state = load();
 function load(){ try{ return Object.assign(defaultState(), JSON.parse(localStorage.getItem(KEY))||{}); }catch(e){ return defaultState(); } }
-function defaultState(){ return {learned:{}, topicStats:{}, cards:{}, mistakes:{}, streak:{n:0,last:null}, total:{c:0,t:0}, tests:[], theme:"light"}; }
+function defaultState(){ return {learned:{}, topicStats:{}, cards:{}, mistakes:{}, streak:{n:0,last:null}, total:{c:0,t:0}, tests:[], theme:"dark"}; }
 function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 function markStudy(){
   const today = new Date().toDateString();
@@ -183,16 +183,25 @@ function renderHome(){
       <img src="img/icons/sparkle.png" class="deco-sparkle s2" alt="">
       <img src="img/icons/star.png" class="deco-sparkle s3" alt="">
     </div>
-    <div class="hero-copy">
-      <span class="hero-eyebrow">🔥 ${state.streak.n} ngày học liên tiếp</span>
-      <h1>Học Ngữ pháp<br><mark>tiếng Anh</mark> THPT</h1>
-      <p>Đầy đủ bài học, phương pháp ghi nhớ khoa học và luyện tập mỗi ngày — cùng Grama chinh phục ngữ pháp thật dễ dàng!</p>
+    <div class="he-side">GRAMMARLAB ✦ HỌC MỖI NGÀY — NHỚ MÃI ✦ THPT</div>
+    <div class="he-copy">
+      <span class="he-kicker">✦ <b>GRAMMARLAB</b> · NGỮ PHÁP TIẾNG ANH · TRUNG HỌC PHỔ THÔNG</span>
+      <h1 class="he-title"><span class="he-word">NGỮ</span><span class="he-mosaic"><img src="img/mascot-wave.png" alt="Grama — khủng long nhỏ ôn ngữ pháp"><i class="t t1"></i><i class="t t2"></i><i class="t t3"></i><i class="t t4"></i></span><span class="he-word">PHÁP</span></h1>
+      <p class="he-sub">Lộ trình <b>16 chủ đề</b> chuẩn lớp 10–12, <b>128 câu</b> luyện giải thích chi tiết và một chú khủng long nhỏ đồng hành — chinh phục ngữ pháp mỗi ngày.</p>
       <div class="btns">
         <a class="btn primary big" href="#/lessons">Bắt đầu học →</a>
         <a class="btn ghost big" href="#/flashcards">Ôn ${due} thẻ hôm nay ›</a>
       </div>
+      <div class="he-mx">
+        <div class="mx"><b>16</b><span>CHỦ ĐỀ</span></div>
+        <div class="mx"><b>128</b><span>CÂU LUYỆN</span></div>
+        <div class="mx"><b>96</b><span>THẺ NHỚ</span></div>
+      </div>
     </div>
   </section>
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">${("<span>Spaced Repetition</span><em>✦</em><span class='o'>Active Recall</span><em>✦</em><span>Phương pháp Feynman</span><em>✦</em><span class='o'>Interleaving</span><em>✦</em><span>Pomodoro</span><em>✦</em><span class='o'>Mistake-driven</span><em>✦</em>").repeat(2)}</div>
+  </div>
 
   <div class="grid c3">
     ${feats.map(f=>`<a class="card feature-card ${f[1]}" href="${f[5]}">
