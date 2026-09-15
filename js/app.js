@@ -2,9 +2,9 @@
 "use strict";
 
 /* ---------- Data merge ---------- */
-const LESSONS = [...LESSONS_A, ...LESSONS_B, ...LESSONS_C];
-const QUESTIONS = [...QUESTIONS_A, ...QUESTIONS_B, ...QUESTIONS_C];
-FLASHCARDS.push(...FLASHCARDS_B); // gộp thẻ phần B
+const LESSONS = [...LESSONS_A, ...LESSONS_B, ...LESSONS_C, ...LESSONS_D];
+const QUESTIONS = [...QUESTIONS_A, ...QUESTIONS_B, ...QUESTIONS_C, ...QUESTIONS_D];
+FLASHCARDS.push(...FLASHCARDS_B, ...FLASHCARDS_C); // gộp thẻ phần B & C
 const TOPIC = Object.fromEntries(LESSONS.map(l => [l.id, l]));
 /* Icon minh họa vẽ tay cho từng chủ đề (crop từ sticker sheet) */
 const TOPIC_IMG = {
@@ -14,14 +14,20 @@ const TOPIC_IMG = {
   "passive":"gears", "reported":"envelope", "conditionals":"rainbow",
   "relative":"chain", "modals":"key", "adverbial":"signpost", "inversion":"spintop",
   "prepositions":"mushroom", "word-forms":"penciljar", "sva":"bouquet", "causative":"backpack",
-  "phrasal":"plane", "noun-clauses":"snail", "collocations":"teacup", "question-tags":"cactus"
+  "phrasal":"plane", "noun-clauses":"snail", "collocations":"teacup", "question-tags":"cactus",
+  "transform":"swap", "subjunctive":"candle", "used-to":"footprints", "so-neither":"bubbleI",
+  "not-until":"flagtime", "linking":"knots", "errors":"bugglass", "signals":"traffic"
 };
 /* Tranh minh họa riêng của từng bài học */
 const LESSON_ART = {
   "prepositions":"img/lessons/prepositions.png", "word-forms":"img/lessons/word-forms.png",
   "sva":"img/lessons/sva.png", "causative":"img/lessons/causative.png",
   "phrasal":"img/lessons/phrasal.png", "noun-clauses":"img/lessons/noun-clauses.png",
-  "collocations":"img/lessons/collocations.png", "question-tags":"img/lessons/question-tags.png"
+  "collocations":"img/lessons/collocations.png", "question-tags":"img/lessons/question-tags.png",
+  "transform":"img/lessons/transform.png", "subjunctive":"img/lessons/subjunctive.png",
+  "used-to":"img/lessons/used-to.png", "so-neither":"img/lessons/so-neither.png",
+  "not-until":"img/lessons/not-until.png", "linking":"img/lessons/linking.png",
+  "errors":"img/lessons/errors.png", "signals":"img/lessons/signals.png"
 };
 const topicIcon = (id) => TOPIC_IMG[id] ? `<img src="img/icons/${TOPIC_IMG[id]}.png" alt="" loading="lazy">` : (TOPIC[id]?.icon||"📘");
 
