@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#183d35" />
+  <title>Mossgrove — A cozy little valley</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <main class="game-stage" id="gameStage" aria-label="Mossgrove cozy farming game">
+      <canvas id="world" aria-label="Khu vườn Mossgrove, chạm vào các vật thể để tương tác"></canvas>
+      <div class="atmosphere" aria-hidden="true"></div>
+
+      <header class="hud top-hud">
+        <button class="profile-card glass-panel" id="profileButton" aria-label="Mở hồ sơ người chơi">
+          <span class="portrait-hex" aria-hidden="true">
+            <span class="portrait-hat"></span>
+            <span class="portrait-hair"></span>
+            <span class="portrait-face"></span>
+            <span class="portrait-body"></span>
+          </span>
+          <span class="profile-copy">
+            <span class="eyebrow">FARMER</span>
+            <strong>Hana</strong>
+            <span class="mini-bars" aria-label="Năng lượng và kinh nghiệm">
+              <span class="stat-bar energy"><i id="energyBar"></i></span>
+              <span class="stat-bar xp"><i></i></span>
+            </span>
+          </span>
+          <span class="level-badge">07</span>
+        </button>
+
+        <div class="brand-mark" aria-label="Mossgrove">
+          <span class="brand-sprig">✦</span>
+          <span>Mossgrove</span>
+          <small>quiet days, good soil</small>
+        </div>
+
+        <button class="calendar-card glass-panel" id="calendarButton" aria-label="Mở lịch và thời tiết">
+          <span class="calendar-copy"><b>SAT</b><small>DAY 07</small></span>
+          <span class="sun-icon" aria-hidden="true"><i></i></span>
+          <span class="calendar-corner">⌄</span>
+        </button>
+      </header>
+
+      <aside class="quest-card glass-panel" id="questCard">
+        <div class="quest-heading">
+          <span class="quest-kicker">TODAY'S LITTLE LIST</span>
+          <span class="quest-count"><b id="questDone">1</b>/3</span>
+        </div>
+        <div class="quest-progress"><i id="questProgress"></i></div>
+        <button class="quest-row done" data-focus="house"><span class="quest-check">✓</span><span>Wake up gently</span><em>done</em></button>
+        <button class="quest-row" id="wheatQuest" data-focus="wheat"><span class="quest-check"></span><span>Gather a little wheat</span><em>+12</em></button>
+        <button class="quest-row" id="coinQuest" data-focus="coin"><span class="quest-check"></span><span>Find something shiny</span><em>+8</em></button>
+      </aside>
+
+      <div class="world-tip" id="worldTip"><span class="tip-dot"></span><span>Chạm vào một vật thể để bắt đầu</span></div>
+
+      <div class="interaction-panel" id="interactionPanel" aria-live="polite" aria-hidden="true">
+        <span class="interaction-icon" id="interactionIcon">✦</span>
+        <span class="interaction-copy"><b id="interactionTitle">Mossgrove</b><small id="interactionDescription">Một ngày đẹp để làm vườn.</small></span>
+        <button class="primary-action" id="interactionAction">Xem</button>
+      </div>
+
+      <div class="tool-menu glass-panel" id="toolMenu" aria-hidden="true">
+        <button data-tool="harvest"><span class="tool-mini-icon">⌁</span><span>Thu hoạch</span><small>1</small></button>
+        <button data-tool="chop"><span class="tool-mini-icon">↗</span><span>Đốn gỗ</span><small>2</small></button>
+        <button data-tool="plant"><span class="tool-mini-icon">♧</span><span>Gieo hạt</span><small>3</small></button>
+      </div>
+
+      <nav class="action-dock" aria-label="Công cụ và kho đồ">
+        <button class="dock-button lock-button" id="lockButton" aria-label="Khu vực khóa">
+          <span class="hex-shell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.8 10V7.8a4.2 4.2 0 0 1 8.4 0V10M6.2 10h11.6v9H6.2zM12 13.2v2.5"/></svg></span>
+          <small>LOCKED</small>
+        </button>
+        <button class="dock-button bag-button" id="bagButton" aria-label="Mở túi đồ">
+          <span class="hex-shell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8 2-3h10l2 3v10.5H5zM5 8h14M9 11h6M9 5v3M15 5v3"/></svg></span>
+          <small id="bagCount">06</small>
+        </button>
+        <button class="dock-button tool-button" id="toolButton" aria-label="Chọn công cụ" aria-expanded="false">
+          <span class="hex-shell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.2 4.5 5.3 5.3M13.5 6.5 4 16l4 4 9.5-9.5M4 16l-1 5 5-1"/></svg></span>
+          <small id="toolLabel">TOOL</small>
+        </button>
+      </nav>
+
+      <div class="mobile-caption">MOSS<span>GROVE</span> <i>•</i> DAY 07</div>
+
+      <section class="modal-backdrop" id="inventoryModal" aria-hidden="true">
+        <div class="modal-card inventory-card" role="dialog" aria-modal="true" aria-labelledby="inventoryTitle">
+          <button class="modal-close" data-close-modal="inventoryModal" aria-label="Đóng">×</button>
+          <div class="modal-title-row"><span class="modal-kicker">YOUR LITTLE SATCHEL</span><span class="modal-leaf">♧</span></div>
+          <h2 id="inventoryTitle">Kho đồ của Hana</h2>
+          <p class="modal-subtitle">Những thứ nhặt được trong một buổi sáng yên lành.</p>
+          <div class="inventory-grid">
+            <div class="inventory-item"><span class="item-art wheat-art">✦</span><b id="wheatCount">5</b><small>Lúa mì</small></div>
+            <div class="inventory-item"><span class="item-art wood-art">⌁</span><b id="woodCount">2</b><small>Gỗ thông</small></div>
+            <div class="inventory-item"><span class="item-art egg-art">●</span><b id="eggCount">0</b><small>Trứng gà</small></div>
+            <div class="inventory-item"><span class="item-art coin-art">✧</span><b id="coinCount">24</b><small>Xu nắng</small></div>
+          </div>
+          <div class="inventory-footer"><span><i class="tiny-spark"></i> Túi vải nhỏ</span><span>4 / 12 ô</span></div>
+        </div>
+      </section>
+
+      <section class="modal-backdrop" id="calendarModal" aria-hidden="true">
+        <div class="modal-card calendar-modal-card" role="dialog" aria-modal="true" aria-labelledby="calendarTitle">
+          <button class="modal-close" data-close-modal="calendarModal" aria-label="Đóng">×</button>
+          <div class="calendar-big-icon"><span class="sun-icon large"><i></i></span></div>
+          <span class="modal-kicker">A SOFT WEATHER REPORT</span>
+          <h2 id="calendarTitle">Thứ Bảy, ngày 7</h2>
+          <p class="weather-line">Nắng nhẹ, ấm áp <span>•</span> 22°C</p>
+          <div class="week-strip"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><strong>SAT</strong><span>SUN</span></div>
+          <button class="rest-button" id="restButton">Nghỉ ngơi đến ngày mai <span>→</span></button>
+        </div>
+      </section>
+
+      <div class="toast" id="toast" role="status"><span class="toast-icon">✦</span><span id="toastText">Chào mừng đến Mossgrove</span></div>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
